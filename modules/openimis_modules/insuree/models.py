@@ -2,7 +2,7 @@ import os.path
 import uuid
 
 import core
-from core import models as core_models
+from modules.openimis_modules.openimis_core import models as core_models
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -32,22 +32,6 @@ class FamilyType(models.Model):
     class Meta:
         managed = True
         db_table = "tblFamilyTypes"
-
-
-class ConfirmationType(models.Model):
-    code = models.CharField(
-        db_column="ConfirmationTypeCode", primary_key=True, max_length=3
-    )
-    confirmationtype = models.CharField(db_column="ConfirmationType", max_length=50)
-    sort_order = models.IntegerField(db_column="SortOrder", blank=True, null=True)
-    alt_language = models.CharField(
-        db_column="AltLanguage", max_length=50, blank=True, null=True
-    )
-    is_confirmation_number_required = models.BooleanField(default=False)
-
-    class Meta:
-        managed = True
-        db_table = "tblConfirmationTypes"
 
 
 class Family(core_models.VersionedModel, core_models.ExtendableModel):
@@ -89,16 +73,7 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel):
     confirmation_no = models.CharField(
         db_column="ConfirmationNo", max_length=12, blank=True, null=True
     )
-    confirmation_type = models.ForeignKey(
-        ConfirmationType,
-        models.DO_NOTHING,
-        db_column="ConfirmationType",
-        blank=True,
-        null=True,
-        related_name="families",
-    )
     audit_user_id = models.IntegerField(db_column="AuditUserID")
-    # rowid = models.TextField(db_column='RowID', blank=True, null=True)
 
     def __str__(self):
         return str(self.head_insuree)
@@ -107,33 +82,6 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel):
     def filter_queryset(cls, queryset=None):
         if queryset is None:
             queryset = cls.objects.all()
-        return queryset
-
-    @classmethod
-    def get_queryset(cls, queryset, user):
-        queryset = cls.filter_queryset(queryset)
-        # GraphQL calls with an info object while Rest calls with the user itself
-        if isinstance(user, ResolveInfo):
-            user = user.context.user
-        if settings.ROW_SECURITY and user.is_anonymous:
-            return queryset.filter(id=-1)
-        if InsureeConfig.excluded_insuree_chfids:
-            queryset = queryset.exclude(
-                members__chf_id__in=InsureeConfig.excluded_insuree_chfids
-            )
-        if (
-            settings.ROW_SECURITY
-            and not user.is_imis_admin
-            and not InsureeConfig.no_location_check
-        ):
-            from location.schema import LocationManager
-
-            return queryset.filter(
-                LocationManager().build_user_location_filter_query(
-                    user._u, prefix="location__parent__parent", loc_types=["D"]
-                )
-            )
-
         return queryset
 
     class Meta:
