@@ -1,4 +1,5 @@
 from .database import *
+from .logging import *
 import os
 from .. import BASE_DIR
 

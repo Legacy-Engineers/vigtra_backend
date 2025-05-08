@@ -3,6 +3,10 @@ import pathlib
 
 PARENT_DIR = pathlib.Path(__file__).resolve().parent.parent
 
+VIGTRA_MODULES = [
+    
+]
+
 OPENIMIS_MODULES = [
     {
         "name": "insuree",

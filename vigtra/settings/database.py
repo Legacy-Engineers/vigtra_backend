@@ -1,5 +1,8 @@
 import os
 from .. import BASE_DIR
+import logging
+
+logger = logging.getLogger(__name__)
 
 SUPPORTED_DATABASE_ENGINES = [
     "django.db.backends.sqlite3",
@@ -29,3 +32,7 @@ elif SERVER_ENGINE == "django.db.backends.postgresql":
             "PORT": os.getenv("DB_PORT", "5432"),
         }
     }
+
+else:
+    logger.error("Unsupported database engine: %s", SERVER_ENGINE)
+    raise ValueError(f"Unsupported database engine: {SERVER_ENGINE}")
