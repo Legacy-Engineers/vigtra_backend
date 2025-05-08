@@ -1,8 +1,8 @@
 from django.db import models
-from modules.openimis_modules.openimis_core import models as core_models
+from modules.openimis_core import models as core_models
 from modules.authentication.models import User
-from modules.openimis_modules.product.models import Product
-from modules.openimis_modules.contribution.models import ContributionPlan
+from modules.product.models import Product
+from modules.contribution.models import ContributionPlan
 
 import uuid
 
@@ -47,7 +47,7 @@ class Policy(core_models.VersionedModel):
         max_digits=18, decimal_places=2, blank=True, null=True
     )
     policy_holder_id = models.CharField(max_length=100)
-    policy_holder_type = models.CharField(max_length=2, )
+    policy_holder_type = models.CharField(max_length=2, choices=POLICY_HOLDER_TYPE_CHOICES)
 
     enroll_date = models.DateField()
     start_date = models.DateField()

@@ -1,7 +1,7 @@
 from typing import Dict
 import json
 
-def vigtra_message(success: bool = False, message: str = "", data: dict | None = "" ) -> Dict[str, bool | dict | str]:
+def vigtra_message(success: bool = False, message: str = "", data: dict | None = "", error_details: str = "" ) -> Dict[str, bool | dict | str]:
     """
     Function to create a message dictionary for VIGTRA API responses.
 
@@ -14,11 +14,17 @@ def vigtra_message(success: bool = False, message: str = "", data: dict | None =
         dict: A dictionary containing the success status, message, and data.
     """
     if not message:
-        raise ValueError("In a vigtra message sender, Message cannot be empty") 
+        raise ValueError("In a vigtra message sender, Message cannot be empty")
+    
+    if not success:
+        if not error_details:
+            raise ValueError("In a vigtra message sender, Error details cannot be empty")
+
     return {
         "success": success,
         "message": message,
-        "data": data
+        "data": data,
+        "error_details": error_details
     }
 
 

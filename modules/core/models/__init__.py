@@ -1,0 +1,1 @@
+from modules.core.models.change_log import ChangeLog

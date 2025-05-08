@@ -1,6 +1,6 @@
 import uuid
 import core
-from modules.openimis_modules.openimis_core import models as core_models
+from modules.openimis_core import models as core_models
 from django.db import models
 from location import models as location_models
 
@@ -277,27 +277,27 @@ class InsureePolicy(core_models.VersionedModel):
     insuree = models.ForeignKey(
         Insuree,
         models.DO_NOTHING,
-        db_column="InsureeID",
+        db_column="InsureeRefID",
         related_name="insuree_policies",
     )
     policy = models.ForeignKey(
         "policy.Policy",
         models.DO_NOTHING,
-        db_column="PolicyId",
+        db_column="PolicyRefID",
         related_name="insuree_policies",
     )
 
     enrollment_date = core.fields.DateField(
-        db_column="EnrollmentDate", blank=True, null=True
+        db_column="PolicyEnrollmentDate", blank=True, null=True
     )
-    start_date = core.fields.DateField(db_column="StartDate", blank=True, null=True)
+    start_date = core.fields.DateField(db_column="PolicyStartDate", blank=True, null=True)
     effective_date = core.fields.DateField(
-        db_column="EffectiveDate", blank=True, null=True
+        db_column="PolicyEffectiveDate", blank=True, null=True
     )
-    expiry_date = core.fields.DateField(db_column="ExpiryDate", blank=True, null=True)
+    expiry_date = core.fields.DateField(db_column="PolicyExpiryDate", blank=True, null=True)
 
-    offline = models.BooleanField(db_column="isOffline", blank=True, null=True)
-    audit_user_id = models.IntegerField(db_column="AuditUserID")
+    offline = models.BooleanField(db_column="PolicyIsOffline", blank=True, null=True)
+    audit_user_id = models.IntegerField(db_column="PolicyAuditUserID")
 
     @classmethod
     def filter_queryset(cls, queryset=None):
