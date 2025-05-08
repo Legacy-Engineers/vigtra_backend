@@ -1,14 +1,29 @@
 from django.db import models
 from modules.location.models import Location
 from modules.insuree.models import Insuree
-from modules.contribution.models.contribution_plans import ContributionPlanBundle
+from modules.contribution.contribution_plan.models import ContributionPlanBundle
 from modules.policy.models import Policy
 # Create your models here.
 
+SECTOR_TYPE_CHOICES = [
+    (1, "Private"),
+    (2, "Public"),
+    (3, "NGO"),
+    (4, "Other"),
+    (5, "International"),
+    (6, "Cooperative"),
+    (7, "Association"),
+    (8, "Self Employed"),
+    (9, "Informal"),
+    (10, "Formal"),
+    (11, "Other")
+]
 
 class FormalSector(models.Model):
     code = models.CharField(db_column='FormalSectorCode', max_length=32)
     trade_name = models.CharField(db_column='TradeName', max_length=255)
+    sector_type = models.CharField(max_length=10)
+    sector_type_other = models.CharField(max_length=20, blank=True, null=True)
     location = models.ForeignKey(Location, db_column='LocationsId', on_delete=models.deletion.DO_NOTHING, blank=True, null=True)
     address = models.JSONField(db_column='Address', blank=True, null=True)
     phone = models.CharField(db_column='Phone', max_length=16, blank=True, null=True)

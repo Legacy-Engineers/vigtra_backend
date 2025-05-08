@@ -1,5 +1,5 @@
 from django.db import models
-from modules.openimis_core import models as core_models
+from modules.core.models import openimis_core_models as core_models
 from modules.authentication.models import User
 from modules.product.models import Product
 from modules.contribution.models import ContributionPlan

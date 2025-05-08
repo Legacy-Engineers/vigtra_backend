@@ -1,6 +1,6 @@
 import uuid
 import core
-from modules.openimis_core import models as core_models
+from modules.core.models import openimis_core_models as core_models
 from django.db import models
 from location import models as location_models
 
