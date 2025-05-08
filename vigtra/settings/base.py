@@ -1,6 +1,7 @@
 from .database import *
 from .logging import *
 from .authentication import *
+from .graphql import * 
 from modules.core.module_loader import get_module_list
 import os
 from .. import BASE_DIR
@@ -18,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party apps
     "corsheaders",
+    "django_filters",
     "graphene_django",
 ]
 

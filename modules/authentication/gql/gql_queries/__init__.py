@@ -1,0 +1,2 @@
+from modules.authentication.gql.gql_queries.permission import PermissionGQLType
+from modules.authentication.gql.gql_queries.groups import GroupGQLType

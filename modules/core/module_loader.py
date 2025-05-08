@@ -26,7 +26,7 @@ MODULES = [
         "module": "modules.claim.claim_ai",
     },
     {
-        "name": "authentication",
+        "name": "Authentication",
         "module": "modules.authentication",
     },
     {
@@ -92,3 +92,33 @@ def get_module_urls():
         except AttributeError as e:
             logger.warning(f"No 'urls' module or 'urlpatterns' in {module['name']}: {e}")
     return urls
+
+
+def get_module_queries():
+    queries = []
+    for module in MODULES:
+        module_path = module["module"]
+        try:
+            schema_module = importlib.import_module(f"{module_path}.schema")
+            if hasattr(schema_module, "Query"):
+                queries.append(schema_module.Query)
+        except ImportError as e:
+            logger.warning(f"Error importing schema for {module['name']}: {e}")
+        except AttributeError as e:
+            logger.warning(f"No 'Query' in schema for {module['name']}: {e}")
+    return queries
+
+
+def get_module_mutations():
+    mutations = []
+    for module in MODULES:
+        module_path = module["module"]
+        try:
+            schema_module = importlib.import_module(f"{module_path}.schema")
+            if hasattr(schema_module, "Mutation"):
+                mutations.append(schema_module.Mutation)
+        except ImportError as e:
+            logger.warning(f"Error importing schema for {module['name']}: {e}")
+        except AttributeError as e:
+            logger.warning(f"No 'Mutation' in schema for {module['name']}: {e}")
+    return mutations
