@@ -1,6 +1,10 @@
 from django.db import models
 from modules.openimis_modules.openimis_core import models as core_models
+from modules.authentication.models import User
+from modules.openimis_modules.product.models import Product
+from modules.openimis_modules.contribution.models import ContributionPlan
 
+import uuid
 
 STATUS_CHOICES = [
     (1, "IDLE"),
@@ -21,6 +25,14 @@ STAGE_CHOICES = [
     ("X", "Closed"),
 ]
 
+POLICY_HOLDER_TYPE_CHOICES = [
+    (1, "Insuree"),
+    (2, "Family"),
+    (3, "Employer"),
+    (4, "Group/Organization"),
+    (5, "Institution"),
+]
+
 class Policy(core_models.VersionedModel):
     id = models.AutoField(primary_key=True)
     uuid = models.CharField(
@@ -34,10 +46,9 @@ class Policy(core_models.VersionedModel):
     value = models.DecimalField(
         max_digits=18, decimal_places=2, blank=True, null=True
     )
+    policy_holder_id = models.CharField(max_length=100)
+    policy_holder_type = models.CharField(max_length=2, )
 
-    family = models.ForeignKey(
-        Family, models.DO_NOTHING, null=True, blank=True
-    )
     enroll_date = models.DateField()
     start_date = models.DateField()
     effective_date = models.DateField(blank=True, null=True)
@@ -47,13 +58,13 @@ class Policy(core_models.VersionedModel):
         Product, models.DO_NOTHING
     )
     officer = models.ForeignKey(
-        Officer,
+        User,
         models.DO_NOTHING,
         blank=True,
         null=True,
     )
 
-    offline = models.BooleanField( blank=True, null=True)
+    offline = models.BooleanField(blank=True, null=True)
     audit_user_id = models.IntegerField()
     contribution_plan = models.ForeignKey(
         ContributionPlan,
@@ -62,7 +73,7 @@ class Policy(core_models.VersionedModel):
         null=True,
     )
     creation_date = models.DateField(
-         default=django_tz.now, blank=True, null=True
+        auto_now=True, blank=True, null=True
     )
 
     def claim_ded_rems(self):
@@ -71,31 +82,6 @@ class Policy(core_models.VersionedModel):
     def is_new(self):
         return not self.stage or self.stage == Policy.STAGE_NEW
 
-    def can_add_insuree(self):
-        return (
-            self.family.members.filter(validity_to__isnull=True).count()
-            < self.product.max_members
-        )
-
     class Meta:
         managed = True
         db_table = "tblPolicies"
-
-
-    @classmethod
-    def get_queryset(cls, queryset, user):
-        queryset = Policy.filter_queryset(queryset)
-        # GraphQL calls with an info object while Rest calls with the user itself
-        if isinstance(user, ResolveInfo):
-            user = user.context.user
-        if settings.ROW_SECURITY and user.is_anonymous:
-            return queryset.filter(id=-1)
-        # TODO: check the access to the policy information but how ?
-        #   Policy -> Product -> Location ? Policy -> Insurees -> HF -> Location ?
-        # if settings.ROW_SECURITY:
-        #     dist = UserDistrict.get_user_districts(user._u)
-        #     return queryset.filter(
-        #         health_facility__location_id__in=[l.location.id for l in dist]
-        #     )
-
-        return queryset

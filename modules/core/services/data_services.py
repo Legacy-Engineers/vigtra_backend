@@ -1,7 +1,7 @@
 from typing import List
 from modules.authentication.models import User
 from ..utils import vigtra_message
-from ..module_loader import OPENIMIS_MODULES, VIGTRA_MODULES
+from ..module_loader import MODULES
 import importlib
 import logging
 
@@ -13,11 +13,10 @@ class DataService:
 
     @classmethod
     def load_default_data_from_modules(cls)-> List[vigtra_message]:
-        modules = OPENIMIS_MODULES + VIGTRA_MODULES
 
         results = []
 
-        for module in modules:
+        for module in MODULES:
             validate = cls._validate_module(module)
 
             if not validate:

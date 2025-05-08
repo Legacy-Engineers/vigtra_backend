@@ -3,17 +3,13 @@ import pathlib
 
 PARENT_DIR = pathlib.Path(__file__).resolve().parent.parent
 
-VIGTRA_MODULES = [
-    
-]
-
-OPENIMIS_MODULES = [
-    {
+MODULES = [
+        {
         "name": "insuree",
-        "module": "modules.openimis_modules.insuree",
+        "module": "modules.insuree",
     },
     {
         "name": "policy",
-        "module": "modules.openimis_modules.policy",
+        "module": "modules.policy",
     },
 ]
