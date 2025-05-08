@@ -53,7 +53,7 @@ class ChangeLog(models.Model):
     success = models.BooleanField(default=True)
     error_message = models.TextField(null=True, blank=True)
     error_code = models.CharField(max_length=50, null=True, blank=True)
-    api_type = models.CharField(max_length=2, choices=[(1, "Graphql", 2, "Rest", 2, "Web")], default=2)
+    api_type = models.CharField(max_length=2, choices=[(1, "Graphql"), (2, "Rest"), (3, "Web"),], default=2)
 
 
     class Meta:

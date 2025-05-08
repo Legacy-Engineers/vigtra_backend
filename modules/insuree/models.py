@@ -1,9 +1,12 @@
 import uuid
-import core
 from modules.core.models import openimis_core_models as core_models
 from django.db import models
-from location import models as location_models
+from modules.location import models as location_models
+import datetime
 
+import os
+
+AGE_OF_MAJORITY = os.getenv("AGE_OF_MAJORITY", 18)
 
 class Gender(models.Model):
     code = models.CharField(db_column="Code", primary_key=True, max_length=1)
@@ -162,7 +165,7 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
         blank=True,
         null=True,
     )
-    dob = core.fields.DateField(db_column="DOB", blank=True, null=True)
+    dob = models.DateField(db_column="DOB", blank=True, null=True)
 
     head = models.BooleanField(db_column="IsHead", default=False)
     marital = models.CharField(db_column="Marital", max_length=1, blank=True, null=True)
@@ -210,7 +213,7 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
         blank=True,
         null=True,
     )
-    identification = models.ForeignObject(
+    identification = models.ForeignKey(
         IdentificationType,
         on_delete=models.DO_NOTHING,
     )
@@ -229,7 +232,7 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
         blank=True,
         null=True,
     )
-    status_date = core.fields.DateField(db_column="status_date", null=True, blank=True)
+    status_date = models.DateField(db_column="status_date", null=True, blank=True)
     status_reason = models.ForeignKey(
         InsureeStatusReason,
         models.DO_NOTHING,
@@ -247,7 +250,7 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     def age(self, reference_date=None):
         if self.dob:
             today = (
-                core.datetime.date.today() if reference_date is None else reference_date
+                datetime.date.today() if reference_date is None else reference_date
             )
             before_birthday = (today.month, today.day) < (self.dob.month, self.dob.day)
             return today.year - self.dob.year - before_birthday
@@ -256,7 +259,7 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
 
     def is_adult(self, reference_date=None):
         if self.dob:
-            return self.age(reference_date) >= core.age_of_majority
+            return self.age(reference_date) >= AGE_OF_MAJORITY
         else:
             return None
 
@@ -269,68 +272,3 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
     class Meta:
         managed = True
         db_table = "tblInsuree"
-
-
-class InsureePolicy(core_models.VersionedModel):
-    id = models.AutoField(db_column="InsureePolicyID", primary_key=True)
-
-    insuree = models.ForeignKey(
-        Insuree,
-        models.DO_NOTHING,
-        db_column="InsureeRefID",
-        related_name="insuree_policies",
-    )
-    policy = models.ForeignKey(
-        "policy.Policy",
-        models.DO_NOTHING,
-        db_column="PolicyRefID",
-        related_name="insuree_policies",
-    )
-
-    enrollment_date = core.fields.DateField(
-        db_column="PolicyEnrollmentDate", blank=True, null=True
-    )
-    start_date = core.fields.DateField(db_column="PolicyStartDate", blank=True, null=True)
-    effective_date = core.fields.DateField(
-        db_column="PolicyEffectiveDate", blank=True, null=True
-    )
-    expiry_date = core.fields.DateField(db_column="PolicyExpiryDate", blank=True, null=True)
-
-    offline = models.BooleanField(db_column="PolicyIsOffline", blank=True, null=True)
-    audit_user_id = models.IntegerField(db_column="PolicyAuditUserID")
-
-    @classmethod
-    def filter_queryset(cls, queryset=None):
-        if queryset is None:
-            queryset = cls.objects.all()
-        return queryset
-
-    class Meta:
-        managed = True
-        db_table = "tblInsureePolicy"
-
-
-class PolicyRenewalDetail(core_models.VersionedModel):
-    """
-    When there is a policy renewal in progress, there might also be a need to update the picture or something else.
-    As this part is quite specific to the insuree, it is handled in this module rather than policy (like PolicyRenewal)
-    """
-
-    id = models.AutoField(db_column="RenewalDetailID", primary_key=True)
-
-    insuree = models.ForeignKey(
-        "insuree.Insuree",
-        models.DO_NOTHING,
-        db_column="InsureeID",
-        related_name="policy_renewal_details",
-    )
-    policy_renewal = models.ForeignKey(
-        "policy.PolicyRenewal",
-        models.DO_NOTHING,
-        db_column="RenewalID",
-        related_name="details",
-    )
-
-    class Meta:
-        managed = True
-        db_table = "tblPolicyRenewalDetails"

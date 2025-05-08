@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
 
 LOGGING = {
     'version': 1,

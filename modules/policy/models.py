@@ -2,7 +2,7 @@ from django.db import models
 from modules.core.models import openimis_core_models as core_models
 from modules.authentication.models import User
 from modules.product.models import Product
-from modules.contribution.models import ContributionPlan
+from modules.contribution.contribution_plan.models import ContributionPlan
 
 import uuid
 

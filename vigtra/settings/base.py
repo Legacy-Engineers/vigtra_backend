@@ -1,9 +1,15 @@
 from .database import *
 from .logging import *
+from .authentication import *
+from modules.core.module_loader import get_module_list
 import os
 from .. import BASE_DIR
 
 INSTALLED_APPS = [
+    # Modules
+    "modules.core",
+
+    # Default Django APPS
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -14,6 +20,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "graphene_django",
 ]
+
+INSTALLED_APPS += get_module_list()
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -79,3 +87,4 @@ USE_TZ = True
 STATIC_URL = os.getenv("STATIC_URL", "static/")
 
 DEFAULT_AUTO_FIELD = os.getenv("DEFAULT_AUTO_FIELD", "django.db.models.BigAutoField")
+

@@ -1,7 +1,6 @@
 from django.apps import AppConfig
 
-URL_PREFIX = 'fhir-api'
 
-class FhirApiConfig(AppConfig):
+class ContractConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'modules.fhir_api'
+    name = 'modules.formal_sector.contract'
