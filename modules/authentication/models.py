@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-
+import uuid
 
 class UserManager(BaseUserManager):
     """
@@ -34,6 +34,7 @@ class User(AbstractUser, PermissionsMixin):
     """
     Custom User model for the health software.
     """
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     username = models.CharField(_("Username"), max_length=20, unique=True)
     email = models.EmailField(_('email address'), unique=True)
     created_at = models.DateTimeField(_('created at'), default=timezone.now)

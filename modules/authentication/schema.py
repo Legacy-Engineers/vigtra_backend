@@ -1,11 +1,20 @@
 import graphene
 from modules.authentication.gql import gql_queries, gql_mutations
-from graphene_django import DjangoConnectionField
+from graphene_django.filter import DjangoFilterConnectionField
+import graphql_jwt
+
 
 class Query(graphene.ObjectType):
-    permissions =DjangoConnectionField(gql_queries.PermissionGQLType)
-    user_groups =DjangoConnectionField(gql_queries.GroupGQLType)
+    permissions = DjangoFilterConnectionField(gql_queries.PermissionGQLType)
+    user_groups = DjangoFilterConnectionField(gql_queries.GroupGQLType)
+    users = DjangoFilterConnectionField(gql_queries.UserGQLType)
 
 
+class Mutation(graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+    create_user = gql_mutations.CreateUserMutation.Field()
 
-schema = graphene.Schema(query=Query)
+
+schema = graphene.Schema(query=Query, mutation=Mutation)

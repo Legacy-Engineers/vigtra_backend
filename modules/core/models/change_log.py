@@ -37,6 +37,20 @@ ACTION_CHOICES = [
     (33, "Undrafted"),
 ]
 
+REQUEST_RESULT_TYPE_CHOICES = [
+    (1, "Successful"),
+    (2, "Failed"),
+    (3, "Unauthorized"),
+    (4, "Forbidden"),
+    (5, "Not Found"),
+    (6, "Conflict"),
+    (7, "Internal Server Error"),
+    (8, "Bad Request"),
+    (9, "Service Unavailable"),
+    (10, "Gateway Timeout"),
+]
+
+
 class ChangeLog(models.Model):
     module = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
@@ -51,10 +65,20 @@ class ChangeLog(models.Model):
     request_header = models.JSONField(null=True, blank=True)
 
     success = models.BooleanField(default=True)
+    request_result_type = models.CharField(
+        max_length=5, choices=REQUEST_RESULT_TYPE_CHOICES, null=True, blank=True
+    )
     error_message = models.TextField(null=True, blank=True)
     error_code = models.CharField(max_length=50, null=True, blank=True)
-    api_type = models.CharField(max_length=2, choices=[(1, "Graphql"), (2, "Rest"), (3, "Web"),], default=2)
-
+    api_type = models.CharField(
+        max_length=2,
+        choices=[
+            (1, "Graphql"),
+            (2, "Rest"),
+            (3, "Web"),
+        ],
+        default=2,
+    )
 
     class Meta:
         verbose_name = "Change Log"

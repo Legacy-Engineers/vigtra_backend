@@ -1,17 +1,19 @@
 import graphene
 from .module_loader import get_module_queries, get_module_mutations
+from .gql import gql_queries
+from graphene_django.filter import DjangoFilterConnectionField
+
+all_queries = get_module_queries()
+all_mutations = get_module_mutations()
 
 
-all_queries = tuple(get_module_queries())  # Tuple of base classes
-all_mutations = tuple(get_module_mutations())
+class Query(*all_queries, graphene.ObjectType):
+    change_logs = DjangoFilterConnectionField(gql_queries.ChangeLogGQLType)
 
-# Dynamically create the Query class
-Query = type("Query", all_queries + (graphene.ObjectType,), {
-    "hello": graphene.String(default_value="Hi!")
-})
 
-# Dynamically create the Mutation class (optional)
-Mutation = type("Mutation", all_mutations + (graphene.ObjectType,), {}) if all_mutations else None
+class Mutation(*all_mutations, graphene.ObjectType):
+    pass
+
 
 # Generate schema with or without Mutation
-schema = graphene.Schema(query=Query, mutation=Mutation)
+schema = graphene.Schema(query=Query, mutation=Mutation if all_mutations else None)
