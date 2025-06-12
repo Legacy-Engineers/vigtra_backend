@@ -3,60 +3,53 @@ from modules.core.models import openimis_core_models as core_models
 from modules.authentication.models import User
 from modules.product.models import Product
 from modules.contribution.contribution_plan.models import ContributionPlan
-
+from django_lifecycle import LifecycleModel, hook, BEFORE_UPDATE, AFTER_UPDATE
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 import uuid
 
-STATUS_CHOICES = [
-    (1, "IDLE"),
-    (2, "ACTIVE"),
-    (4, "SUSPENDED"),
-    (8, "EXPIRED"),
-    (16, "READY"),
-]
+
+class PolicyStatus(models.IntegerChoices):
+    IDLE = 1
+    ACTIVE = 2
+    SUSPENDED = 4
+    EXPIRED = 8
+    READY = 16
 
 
-STAGE_CHOICES = [
-    ("N", "New"),
-    ("R", "Renewed"),
-    ("C", "Cancelled"),
-    ("E", "Expired"),
-    ("S", "Suspended"),
-    ("T", "Terminated"),
-    ("X", "Closed"),
-]
+class PolicyStage(models.TextChoices):
+    NEW = "N", "New"
+    RENEWED = "R", "Renewed"
+    CANCELLED = "C", "Cancelled"
+    EXPIRED = "E", "Expired"
+    SUSPENDED = "S", "Suspended"
+    TERMINATED = "T", "Terminated"
+    CLOSED = "X", "Closed"
 
-POLICY_HOLDER_TYPE_CHOICES = [
-    (1, "Insuree"),
-    (2, "Family"),
-    (3, "Employer"),
-    (4, "Group/Organization"),
-    (5, "Institution"),
-]
 
-class Policy(core_models.VersionedModel):
+class Policy(core_models.VersionedModel, LifecycleModel):
     id = models.AutoField(primary_key=True)
-    uuid = models.CharField(
-        max_length=36, default=uuid.uuid4, unique=True
-    )
+    uuid = models.CharField(max_length=36, default=uuid.uuid4, unique=True)
 
     stage = models.CharField(
-        max_length=1, blank=True, null=True, choices=STAGE_CHOICES
+        max_length=1, choices=PolicyStage.choices, blank=True, null=True
     )
-    status = models.SmallIntegerField( blank=True, null=True)
-    value = models.DecimalField(
-        max_digits=18, decimal_places=2, blank=True, null=True
+    status = models.SmallIntegerField(
+        choices=PolicyStatus.choices, blank=True, null=True
     )
-    policy_holder_id = models.CharField(max_length=100)
-    policy_holder_type = models.CharField(max_length=2, choices=POLICY_HOLDER_TYPE_CHOICES)
+    value = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True)
+
+    # The one the policy is for
+    policy_holder_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    policy_holder_id = models.TextField()
+    policy_holder = GenericForeignKey("policy_holder_type", "policy_holder_id")
 
     enroll_date = models.DateField()
     start_date = models.DateField()
     effective_date = models.DateField(blank=True, null=True)
     expiry_date = models.DateField(blank=True, null=True)
 
-    product = models.ForeignKey(
-        Product, models.DO_NOTHING
-    )
+    product = models.ForeignKey(Product, models.DO_NOTHING)
     officer = models.ForeignKey(
         User,
         models.DO_NOTHING,
@@ -72,9 +65,8 @@ class Policy(core_models.VersionedModel):
         blank=True,
         null=True,
     )
-    creation_date = models.DateField(
-        auto_now=True, blank=True, null=True
-    )
+    creation_date = models.DateField(auto_now=True, blank=True, null=True)
+    updation_date = models.DateField(auto_now_add=True, blank=True, null=True)
 
     def claim_ded_rems(self):
         return self.claim_ded_rems

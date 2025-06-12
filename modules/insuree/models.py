@@ -5,6 +5,7 @@ from modules.location import models as location_models
 import datetime
 from modules.authentication.models import User
 import os
+from django_lifecycle import LifecycleModel, hook, BEFORE_UPDATE, AFTER_UPDATE
 
 AGE_OF_MAJORITY = os.getenv("AGE_OF_MAJORITY", 18)
 
@@ -27,7 +28,7 @@ class FamilyType(models.Model):
         db_table = "tblFamilyTypes"
 
 
-class Family(core_models.VersionedModel, core_models.ExtendableModel):
+class Family(core_models.VersionedModel, core_models.ExtendableModel, LifecycleModel):
     id = models.AutoField(db_column="FamilyID", primary_key=True)
     uuid = models.CharField(
         db_column="FamilyUUID", max_length=36, default=uuid.uuid4, unique=True
@@ -124,7 +125,7 @@ class InsureeStatus(models.TextChoices):
     DEAD = "DE"
 
 
-class Insuree(core_models.VersionedModel, core_models.ExtendableModel):
+class Insuree(core_models.VersionedModel, core_models.ExtendableModel, LifecycleModel):
     id = models.AutoField(db_column="InsureeID", primary_key=True)
     uuid = models.CharField(
         db_column="InsureeUUID", max_length=36, default=uuid.uuid4, unique=True

@@ -20,6 +20,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "graphene_django",
     "django_filters",
+    "passkeys",
+    "axes",
+    "django_lifecycle_checks",
 ]
 
 INSTALLED_APPS += get_module_list()
@@ -34,6 +37,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Third party
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "vigtra.urls"
@@ -93,6 +97,8 @@ DEFAULT_AUTO_FIELD = os.getenv("DEFAULT_AUTO_FIELD", "django.db.models.BigAutoFi
 
 
 AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "passkeys.backend.PasskeyModelBackend",
     "graphql_jwt.backends.JSONWebTokenBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
