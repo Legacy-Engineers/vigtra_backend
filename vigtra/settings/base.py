@@ -2,6 +2,8 @@ from .database import *
 from .logging import *
 from .authentication import *
 from .graphql import *
+
+
 from modules.core.module_loader import get_module_list
 import os
 from .. import BASE_DIR
@@ -23,6 +25,7 @@ INSTALLED_APPS = [
     "passkeys",
     "axes",
     "django_lifecycle_checks",
+    "simple_history",
 ]
 
 INSTALLED_APPS += get_module_list()
@@ -38,6 +41,7 @@ MIDDLEWARE = [
     # Third party
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "axes.middleware.AxesMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 ROOT_URLCONF = "vigtra.urls"
