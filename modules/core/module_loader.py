@@ -38,6 +38,10 @@ MODULES = [
         "module": "modules.contribution",
     },
     {
+        "name": "ContributionPlan",
+        "module": "modules.contribution_plan",
+    },
+    {
         "name": "Formal Sector",
         "module": "modules.formal_sector",
     },

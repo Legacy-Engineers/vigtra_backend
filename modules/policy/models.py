@@ -2,8 +2,8 @@ from django.db import models
 from modules.core.models import openimis_core_models as core_models
 from modules.authentication.models import User
 from modules.product.models import Product
-from modules.contribution.contribution_plan.models import ContributionPlan
-from django_lifecycle import LifecycleModel, hook, BEFORE_UPDATE, AFTER_UPDATE
+from modules.contribution_plan.models import ContributionPlan
+from django_lifecycle import LifecycleModel
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 import uuid
