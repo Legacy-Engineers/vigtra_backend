@@ -3,7 +3,7 @@ from graphene_django.filter import DjangoFilterConnectionField
 import graphene
 
 
-class Query(graphene):
+class Query(graphene.ObjectType):
     policys = DjangoFilterConnectionField(gql_queries.PolicyGQLType)
 
 

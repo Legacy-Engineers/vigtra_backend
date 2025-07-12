@@ -163,6 +163,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-guardian"
+version = "3.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/30/c2/3ed43813dd7313f729dbaa829b4f9ed4a647530151f672cfb5f843c12edf/django_guardian-3.0.3.tar.gz", hash = "sha256:4e59eab4d836da5a027cf0c176d14bc2a4e22cbbdf753159a03946c08c8a196d", size = 85410, upload-time = "2025-06-25T20:42:17.475Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/13/e6f629a978ef5fab8b8d2760cacc3e451016cef952cf4c049d672c5c6b07/django_guardian-3.0.3-py3-none-any.whl", hash = "sha256:d2164cea9f03c369d7ade21802710f3ab23ca6734bcc7dfcfb385906783916c7", size = 118198, upload-time = "2025-06-25T20:42:15.377Z" },
+]
+
+[[package]]
 name = "django-ipware"
 version = "7.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -257,6 +269,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7d/97/112c5a72e6917949b6d8a18ad6c6e72c46da4290c8f36ee5f1c1dcbc9901/djangorestframework-3.16.0.tar.gz", hash = "sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9", size = 1068408, upload-time = "2025-03-28T14:18:42.065Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/eb/3e/2448e93f4f87fc9a9f35e73e3c05669e0edd0c2526834686e949bb1fd303/djangorestframework-3.16.0-py3-none-any.whl", hash = "sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361", size = 1067305, upload-time = "2025-03-28T14:18:39.489Z" },
+]
+
+[[package]]
+name = "faker"
+version = "37.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tzdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/65/f9/66af4019ee952fc84b8fe5b523fceb7f9e631ed8484417b6f1e3092f8290/faker-37.4.0.tar.gz", hash = "sha256:7f69d579588c23d5ce671f3fa872654ede0e67047820255f43a4aa1925b89780", size = 1901976, upload-time = "2025-06-11T17:59:30.818Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/5e/c8c3c5ea0896ab747db2e2889bf5a6f618ed291606de6513df56ad8670a8/faker-37.4.0-py3-none-any.whl", hash = "sha256:cb81c09ebe06c32a10971d1bbdb264bb0e22b59af59548f011ac4809556ce533", size = 1942992, upload-time = "2025-06-11T17:59:28.698Z" },
 ]
 
 [[package]]
@@ -603,12 +627,14 @@ dependencies = [
     { name = "django-defender" },
     { name = "django-filter" },
     { name = "django-graphql-jwt" },
+    { name = "django-guardian" },
     { name = "django-lifecycle" },
     { name = "django-mptt" },
     { name = "django-passkeys" },
     { name = "django-redis" },
     { name = "django-simple-history" },
     { name = "djangorestframework" },
+    { name = "faker" },
     { name = "fhir-resources" },
     { name = "graphene-django" },
     { name = "pillow" },
@@ -622,12 +648,14 @@ requires-dist = [
     { name = "django-defender", specifier = ">=0.9.8,<0.10.0" },
     { name = "django-filter", specifier = ">=25.1,<26.0" },
     { name = "django-graphql-jwt", specifier = ">=0.4.0,<0.5.0" },
+    { name = "django-guardian", specifier = ">=3.0.3" },
     { name = "django-lifecycle", specifier = ">=1.2.4,<2.0.0" },
     { name = "django-mptt", specifier = ">=0.17.0,<0.18.0" },
     { name = "django-passkeys", specifier = ">=1.2.8.1,<2.0.0.0" },
     { name = "django-redis", specifier = ">=6.0.0" },
     { name = "django-simple-history", specifier = ">=3.8.0,<4.0.0" },
     { name = "djangorestframework", specifier = ">=3.16.0,<4.0.0" },
+    { name = "faker", specifier = ">=37.4.0" },
     { name = "fhir-resources", specifier = ">=8.0.0,<9.0.0" },
     { name = "graphene-django", specifier = ">=3.2.3,<4.0.0" },
     { name = "pillow", specifier = ">=11.3.0" },

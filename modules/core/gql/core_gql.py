@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 import json
 import logging
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 from modules.core.models.change_log import (
     ChangeLog,
     RequestResultType,
@@ -95,7 +95,14 @@ class MutationResult:
         )
 
 
-class CoreMutation(graphene.Mutation, ABC):
+# Create a custom metaclass that combines GraphQL and ABC metaclasses
+class CoreMutationMeta(type(graphene.Mutation), ABCMeta):
+    """Custom metaclass that combines Graphene Mutation and ABC metaclasses."""
+
+    pass
+
+
+class CoreMutation(graphene.Mutation, metaclass=CoreMutationMeta):
     """
     Enhanced base class for GraphQL mutations with comprehensive logging,
     validation, and error handling functionality.

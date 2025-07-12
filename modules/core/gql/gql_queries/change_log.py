@@ -15,24 +15,6 @@ class ChangeLogGQLType(DjangoObjectType):
     class Meta:
         model = ChangeLog
         interfaces = (graphene.relay.Node,)
-        # Only expose safe fields
-        fields = (
-            "id",
-            "uuid",
-            "module",
-            "model",
-            "action",
-            "object_repr",
-            "message",
-            "timestamp",
-            "success",
-            "api_type",
-            "execution_time",
-            "correlation_id",
-            "error_code",
-            "user",
-            "ip_address",
-        )
 
         # Enhanced filtering
         filter_fields = {

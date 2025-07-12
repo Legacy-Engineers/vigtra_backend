@@ -376,8 +376,7 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel, LifecycleM
         ]
         constraints = [
             models.CheckConstraint(
-                check=Q(confirmation_no__isnull=True)
-                | Q(confirmation_no__length__gte=3),
+                check=Q(confirmation_no__isnull=True),
                 name="chk_family_confirmation_min_length",
             ),
         ]
@@ -819,7 +818,12 @@ class InsureeManager(models.Manager):
         ).distinct()
 
 
-class Insuree(core_models.VersionedModel, core_models.ExtendableModel, LifecycleModel):
+class Insuree(
+    core_models.VersionedModel,
+    core_models.ExtendableModel,
+    LifecycleModel,
+    location_models.LocationObjectLevelPermissionBase,
+):
     """Enhanced Insuree model with better validation and performance."""
 
     # Usage examples and migration helpers:
@@ -1178,37 +1182,6 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel, Lifecycle
     def __str__(self):
         return f"{self.chf_id or 'No CHF ID'} - {self.full_name}"
 
-    class Meta:
-        managed = True
-        db_table = "tblInsurees"
-        verbose_name = _("Insuree")
-        verbose_name_plural = _("Insurees")
-        indexes = [
-            models.Index(fields=["chf_id"], name="idx_insuree_chfid"),
-            models.Index(fields=["last_name", "other_names"], name="idx_insuree_names"),
-            models.Index(fields=["dob"], name="idx_insuree_dob"),
-            models.Index(fields=["status"], name="idx_insuree_status"),
-            models.Index(fields=["gender"], name="idx_insuree_gender"),
-            models.Index(fields=["created_date"], name="idx_insuree_created"),
-            models.Index(
-                fields=["validity_from", "validity_to"], name="idx_insuree_validity"
-            ),
-            models.Index(
-                fields=["identification_number"], name="idx_insuree_id_number"
-            ),
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["chf_id"],
-                condition=Q(chf_id__isnull=False),
-                name="unique_chf_id",
-            ),
-            models.CheckConstraint(
-                check=Q(dob__lte=datetime.date.today()),
-                name="chk_insuree_dob_not_future",
-            ),
-        ]
-
     phone = models.CharField(
         db_column="Phone",
         validators=[phone_regex],
@@ -1241,14 +1214,6 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel, Lifecycle
         blank=True,
         null=True,
         help_text=_("GPS coordinates"),
-    )
-
-    current_village = models.ForeignKey(
-        location_models.Location,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        help_text=_("Current village"),
     )
 
     photo = models.ImageField(  # Changed to ImageField for better validation
@@ -1470,11 +1435,6 @@ class Insuree(core_models.VersionedModel, core_models.ExtendableModel, Lifecycle
                 fields=["chf_id"],
                 condition=Q(chf_id__isnull=False),
                 name="unique_chf_id",
-            ),
-            models.UniqueConstraint(
-                fields=["family", "head"],
-                condition=Q(head=True),
-                name="unique_family_head",
             ),
             models.CheckConstraint(
                 check=Q(dob__lte=datetime.date.today()),

@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from mptt.models import MPTTModel, TreeForeignKey
+from guardian.models import BaseObjectPermission
 
 
 class LocationType(models.Model):
@@ -249,3 +250,10 @@ class HealthFacility(models.Model):
         if self.location:
             return f"{self.name} - {self.location.name}"
         return self.name
+
+
+class LocationObjectLevelPermissionBase(BaseObjectPermission):
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True

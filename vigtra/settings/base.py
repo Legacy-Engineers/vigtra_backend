@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party apps
+    "guardian",
     "corsheaders",
     "graphene_django",
     "django_filters",
@@ -99,6 +100,7 @@ AUTHENTICATION_BACKENDS = [
     "passkeys.backend.PasskeyModelBackend",
     "graphql_jwt.backends.JSONWebTokenBackend",
     "django.contrib.auth.backends.ModelBackend",
+    "guardian.backends.ObjectPermissionBackend",
 ]
 
 
