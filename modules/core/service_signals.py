@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Callable, Any, Optional, Union
+from typing import Dict, Callable, Any, Optional
 from functools import wraps
 from django.dispatch import Signal
 from django.apps import apps
@@ -10,24 +10,27 @@ logger = logging.getLogger(__name__)
 # Dictionary to store signals globally
 REGISTERED_SIGNALS: Dict[str, Signal] = {}
 
+
 class SignalRegistry:
     """
     A registry class to manage custom Django signals with better organization
     and additional features like signal discovery and cleanup.
     """
-    
+
     def __init__(self):
         self._signals: Dict[str, Signal] = {}
         self._receivers: Dict[str, list] = {}
-    
-    def get_or_create_signal(self, signal_name: str, providing_args: Optional[list] = None) -> Signal:
+
+    def get_or_create_signal(
+        self, signal_name: str, providing_args: Optional[list] = None
+    ) -> Signal:
         """
         Get an existing signal or create a new one.
-        
+
         Args:
             signal_name: Unique name for the signal
             providing_args: List of argument names the signal will provide (deprecated in Django 4.0+)
-            
+
         Returns:
             Signal instance
         """
@@ -38,47 +41,48 @@ class SignalRegistry:
             except TypeError:
                 # Django 4.0+ - providing_args is no longer supported
                 self._signals[signal_name] = Signal()
-            
+
             self._receivers[signal_name] = []
             logger.info(f"Created new signal: {signal_name}")
-        
+
         return self._signals[signal_name]
-    
+
     def get_signal(self, signal_name: str) -> Optional[Signal]:
         """Get a signal by name without creating it."""
         return self._signals.get(signal_name)
-    
+
     def list_signals(self) -> Dict[str, int]:
         """List all registered signals and their receiver counts."""
         return {
-            name: len(self._receivers.get(name, []))
-            for name in self._signals.keys()
+            name: len(self._receivers.get(name, [])) for name in self._signals.keys()
         }
-    
+
     def disconnect_all(self, signal_name: str) -> int:
         """Disconnect all receivers from a signal."""
         if signal_name not in self._signals:
             return 0
-        
+
         signal = self._signals[signal_name]
         receivers = self._receivers.get(signal_name, [])
-        
+
         for receiver in receivers:
             signal.disconnect(receiver)
-        
+
         count = len(receivers)
         self._receivers[signal_name] = []
         logger.info(f"Disconnected {count} receivers from signal: {signal_name}")
         return count
-    
+
     def register_receiver(self, signal_name: str, receiver: Callable):
         """Register a receiver function for a signal."""
         if signal_name not in self._receivers:
             self._receivers[signal_name] = []
         self._receivers[signal_name].append(receiver)
 
+
 # Global registry instance
 signal_registry = SignalRegistry()
+
 
 def register_signal(
     signal_name: str,
@@ -86,11 +90,11 @@ def register_signal(
     sender: Optional[Any] = None,
     weak: bool = True,
     dispatch_uid: Optional[str] = None,
-    auto_load: bool = True
+    auto_load: bool = True,
 ) -> Callable:
     """
     Enhanced decorator factory to register a function as a receiver for a custom signal.
-    
+
     Args:
         signal_name: A unique name to register the signal
         providing_args: List of argument names the signal will provide (deprecated in Django 4.0+)
@@ -98,62 +102,68 @@ def register_signal(
         weak: Whether to use weak references for the receiver
         dispatch_uid: Unique identifier for the receiver
         auto_load: Whether to automatically connect the receiver (default: True)
-    
+
     Returns:
         Decorated function connected to the signal
-        
+
     Raises:
         ValueError: If signal_name is empty or None
         ImproperlyConfigured: If Django apps are not ready
     """
     if not signal_name or not isinstance(signal_name, str):
         raise ValueError("signal_name must be a non-empty string")
-    
+
     # Check if Django apps are ready (for production safety)
     if auto_load:
         try:
             apps.check_apps_ready()
         except ImproperlyConfigured as e:
-            logger.warning(f"Django apps not ready when registering signal '{signal_name}': {e}")
-    
+            logger.warning(
+                f"Django apps not ready when registering signal '{signal_name}': {e}"
+            )
+
     def decorator(func: Callable) -> Callable:
         if not callable(func):
             raise TypeError("Decorated object must be callable")
-        
+
         # Get or create the signal
         signal = signal_registry.get_or_create_signal(signal_name, providing_args)
-        
+
         # Create a wrapper to preserve function metadata and add error handling
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                logger.error(f"Error in signal receiver '{func.__name__}' for signal '{signal_name}': {e}")
+                logger.error(
+                    f"Error in signal receiver '{func.__name__}' for signal '{signal_name}': {e}"
+                )
                 raise
-        
+
         # Connect the signal if auto_load is True
         if auto_load:
             signal.connect(
                 wrapper,
                 sender=sender,
                 weak=weak,
-                dispatch_uid=dispatch_uid or f"{signal_name}_{func.__name__}"
+                dispatch_uid=dispatch_uid or f"{signal_name}_{func.__name__}",
             )
             signal_registry.register_receiver(signal_name, wrapper)
-            logger.debug(f"Connected receiver '{func.__name__}' to signal '{signal_name}'")
-        
+            logger.debug(
+                f"Connected receiver '{func.__name__}' to signal '{signal_name}'"
+            )
+
         # Add metadata to the function for introspection
         wrapper._signal = signal
         wrapper._signal_name = signal_name
         wrapper._signal_metadata = {
-            'providing_args': providing_args,
-            'sender': sender,
-            'weak': weak,
-            'dispatch_uid': dispatch_uid,
-            'auto_load': auto_load
+            "providing_args": providing_args,
+            "sender": sender,
+            "weak": weak,
+            "dispatch_uid": dispatch_uid,
+            "auto_load": auto_load,
         }
-        
+
         # Add utility methods
         def manual_connect():
             """Manually connect this receiver to its signal."""
@@ -161,67 +171,70 @@ def register_signal(
                 wrapper,
                 sender=sender,
                 weak=weak,
-                dispatch_uid=dispatch_uid or f"{signal_name}_{func.__name__}"
+                dispatch_uid=dispatch_uid or f"{signal_name}_{func.__name__}",
             )
             signal_registry.register_receiver(signal_name, wrapper)
-        
+
         def disconnect():
             """Disconnect this receiver from its signal."""
             signal.disconnect(
                 wrapper,
                 sender=sender,
-                dispatch_uid=dispatch_uid or f"{signal_name}_{func.__name__}"
+                dispatch_uid=dispatch_uid or f"{signal_name}_{func.__name__}",
             )
-        
+
         wrapper.manual_connect = manual_connect
         wrapper.disconnect = disconnect
-        
+
         return wrapper
-    
+
     return decorator
+
 
 def send_signal(signal_name: str, sender: Any = None, **kwargs) -> list:
     """
     Send a custom signal by name.
-    
+
     Args:
         signal_name: Name of the signal to send
         sender: The sender of the signal
         **kwargs: Additional arguments to pass to receivers
-        
+
     Returns:
         List of (receiver, response) tuples
-        
+
     Raises:
         ValueError: If signal doesn't exist
     """
     signal = signal_registry.get_signal(signal_name)
     if not signal:
         raise ValueError(f"Signal '{signal_name}' is not registered")
-    
+
     logger.debug(f"Sending signal '{signal_name}' from sender: {sender}")
     return signal.send(sender=sender, **kwargs)
+
 
 def get_signal_info(signal_name: str) -> Optional[Dict[str, Any]]:
     """
     Get information about a registered signal.
-    
+
     Args:
         signal_name: Name of the signal
-        
+
     Returns:
         Dictionary with signal information or None if not found
     """
     signal = signal_registry.get_signal(signal_name)
     if not signal:
         return None
-    
+
     return {
-        'name': signal_name,
-        'signal': signal,
-        'receiver_count': len(signal_registry._receivers.get(signal_name, [])),
-        'receivers': signal_registry._receivers.get(signal_name, [])
+        "name": signal_name,
+        "signal": signal,
+        "receiver_count": len(signal_registry._receivers.get(signal_name, [])),
+        "receivers": signal_registry._receivers.get(signal_name, []),
     }
+
 
 # Backward compatibility
 REGISTERED_SIGNALS = signal_registry._signals

@@ -1,8 +1,11 @@
-from modules.core.gql.core_gql import CoreMutation
+from modules.core.gql.core_gql import CreateMutation
+from modules.insuree.services.insuree import InsureeService
 import graphene
 
+INSUREE_SERVICE = InsureeService()
 
-class CreateInsureeMutation(CoreMutation):
+
+class CreateInsureeMutation(CreateMutation):
     """
     Mutation to create an Insuree.
     """

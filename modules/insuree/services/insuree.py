@@ -1,5 +1,6 @@
 from typing import Dict
 from modules.core.service_signals import register_signal
+from modules.insuree.models import Insuree
 
 
 class InsureeService:
@@ -7,5 +8,5 @@ class InsureeService:
         pass
 
     @register_signal("insuree_service.create_insuree")
-    def create_insuree(self, data: dict) -> Dict[str, bool | dict | str]:
+    def create_insuree(self, data: dict, **kwargs) -> Dict[str, bool | dict | str]:
         pass

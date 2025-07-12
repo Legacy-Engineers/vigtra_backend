@@ -1,132 +1,274 @@
 import pathlib
 import logging
 import importlib
+from typing import List, Dict, Any, Optional
+from dataclasses import dataclass
 from django.urls import path, include
+
+logger = logging.getLogger(__name__)
 
 PARENT_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
-logger = logging.getLogger(__name__)
+@dataclass
+class ModuleConfig:
+    """Configuration for a module."""
 
+    name: str
+    module: str
+    enabled: bool = True
+
+
+# Module configuration - easier to manage
 MODULES = [
-    {
-        "name": "Insuree",
-        "module": "modules.insuree",
-    },
-    {
-        "name": "Policy",
-        "module": "modules.policy",
-    },
-    {
-        "name": "Claim",
-        "module": "modules.claim",
-    },
-    {
-        "name": "Claim AI",
-        "module": "modules.claim.claim_ai",
-    },
-    {
-        "name": "Authentication",
-        "module": "modules.authentication",
-    },
-    {
-        "name": "Fhir API",
-        "module": "modules.fhir_api",
-    },
-    {
-        "name": "Contribution",
-        "module": "modules.contribution",
-    },
-    {
-        "name": "ContributionPlan",
-        "module": "modules.contribution_plan",
-    },
-    {
-        "name": "Formal Sector",
-        "module": "modules.formal_sector",
-    },
-    {
-        "name": "Contract",
-        "module": "modules.formal_sector.contract",
-    },
-    {
-        "name": "Location",
-        "module": "modules.location",
-    },
-    {
-        "name": "Product",
-        "module": "modules.product",
-    },
+    ModuleConfig("Insuree", "modules.insuree"),
+    ModuleConfig("Policy", "modules.policy"),
+    ModuleConfig("Claim", "modules.claim"),
+    ModuleConfig("Claim AI", "modules.claim.claim_ai"),
+    ModuleConfig("Authentication", "modules.authentication"),
+    ModuleConfig("FHIR API", "modules.fhir_api"),
+    ModuleConfig("Contribution", "modules.contribution"),
+    ModuleConfig("ContributionPlan", "modules.contribution_plan"),
+    ModuleConfig("Formal Sector", "modules.formal_sector"),
+    ModuleConfig("Contract", "modules.formal_sector.contract"),
+    ModuleConfig("Location", "modules.location"),
+    ModuleConfig("Product", "modules.product"),
 ]
 
 
-def get_module_list():
-    modules = []
-    for module in MODULES:
-        module_name = module["name"]
-        module_path = module["module"]
-        try:
-            # Import the module
-            imported_module = __import__(module_path, fromlist=[module_name])
+class ModuleLoader:
+    """Centralized module loading with caching and error handling."""
 
-            if imported_module:
-                modules.append(module_path)
-        except ImportError as e:
-            logger.warning(f"Error importing {module_name}: {e}")
+    def __init__(self):
+        self._module_cache = {}
+        self._schema_cache = {}
 
-    return modules
-
-
-def get_module_urls():
-    urls = []
-    for module in MODULES:
-        module_path = module["module"]
+    def _import_module_safely(
+        self, module_path: str, module_name: str
+    ) -> Optional[Any]:
+        """Safely import a module with caching."""
+        if module_path in self._module_cache:
+            return self._module_cache[module_path]
 
         try:
-            imported_module = __import__(module_path, fromlist=[module["name"]])
-            if imported_module:
-                module_url = importlib.import_module(f"{module_path}.urls")
-                module_app = importlib.import_module(f"{module_path}.apps")
-                if hasattr(module_url, "urlpatterns"):
-                    if hasattr(module_app, "URL_PREFIX"):
-                        url_pattern = path(
-                            f"{module_app.URL_PREFIX}", include(module_url.urlpatterns)
-                        )
-                        urls.append(url_pattern)
+            imported_module = importlib.import_module(module_path)
+            self._module_cache[module_path] = imported_module
+            return imported_module
         except ImportError as e:
-            logger.warning(f"Error importing {module['name']}: {e}")
-        except AttributeError as e:
-            logger.warning(
-                f"No 'urls' module or 'urlpatterns' in {module['name']}: {e}"
+            logger.warning(f"Failed to import {module_name} ({module_path}): {e}")
+            return None
+
+    def _get_schema_module(self, module_path: str, module_name: str) -> Optional[Any]:
+        """Get schema module with caching."""
+        schema_path = f"{module_path}.schema"
+
+        if schema_path in self._schema_cache:
+            return self._schema_cache[schema_path]
+
+        try:
+            schema_module = importlib.import_module(schema_path)
+            self._schema_cache[schema_path] = schema_module
+            return schema_module
+        except ImportError:
+            logger.debug(f"No schema module found for {module_name}")
+            return None
+
+    def get_available_modules(self) -> List[str]:
+        """Get list of successfully imported module paths."""
+        modules = []
+        for module_config in MODULES:
+            if not module_config.enabled:
+                continue
+
+            if self._import_module_safely(module_config.module, module_config.name):
+                modules.append(module_config.module)
+
+        return modules
+
+    def get_module_urls(self) -> List[Any]:
+        """Get URL patterns from all modules."""
+        urls = []
+
+        for module_config in MODULES:
+            if not module_config.enabled:
+                continue
+
+            # Check if main module exists
+            main_module = self._import_module_safely(
+                module_config.module, module_config.name
             )
-    return urls
+            if not main_module:
+                continue
 
+            try:
+                # Import URL and app modules
+                url_module = importlib.import_module(f"{module_config.module}.urls")
+                app_module = importlib.import_module(f"{module_config.module}.apps")
 
-def get_module_queries():
-    queries = []
-    for module in MODULES:
-        module_path = module["module"]
-        try:
-            schema_module = importlib.import_module(f"{module_path}.schema")
+                # Check for required attributes
+                if not hasattr(url_module, "urlpatterns"):
+                    logger.debug(f"No urlpatterns in {module_config.name}")
+                    continue
+
+                # Get URL prefix
+                url_prefix = getattr(
+                    app_module, "URL_PREFIX", module_config.name.lower()
+                )
+
+                url_pattern = path(f"{url_prefix}/", include(url_module.urlpatterns))
+                urls.append(url_pattern)
+
+                logger.debug(
+                    f"Added URLs for {module_config.name} with prefix '{url_prefix}'"
+                )
+
+            except ImportError as e:
+                logger.debug(f"No URL module for {module_config.name}: {e}")
+            except AttributeError as e:
+                logger.debug(f"Missing URL attributes in {module_config.name}: {e}")
+
+        return urls
+
+    def get_module_queries(self) -> List[Any]:
+        """Get GraphQL queries from all modules."""
+        queries = []
+
+        for module_config in MODULES:
+            if not module_config.enabled:
+                continue
+
+            schema_module = self._get_schema_module(
+                module_config.module, module_config.name
+            )
+            if not schema_module:
+                continue
+
             if hasattr(schema_module, "Query"):
                 queries.append(schema_module.Query)
-        except ImportError as e:
-            logger.warning(f"Error importing schema for {module['name']}: {e}")
-        except AttributeError as e:
-            logger.warning(f"No 'Query' in schema for {module['name']}: {e}")
-    return queries
+                logger.debug(f"Added Query from {module_config.name}")
+            else:
+                logger.debug(f"No Query class in {module_config.name} schema")
 
+        return queries
 
-def get_module_mutations():
-    mutations = []
-    for module in MODULES:
-        module_path = module["module"]
-        try:
-            schema_module = importlib.import_module(f"{module_path}.schema")
+    def get_module_mutations(self) -> List[Any]:
+        """Get GraphQL mutations from all modules."""
+        mutations = []
+
+        for module_config in MODULES:
+            if not module_config.enabled:
+                continue
+
+            schema_module = self._get_schema_module(
+                module_config.module, module_config.name
+            )
+            if not schema_module:
+                continue
+
             if hasattr(schema_module, "Mutation"):
                 mutations.append(schema_module.Mutation)
-        except ImportError as e:
-            logger.warning(f"Error importing schema for {module['name']}: {e}")
-        except AttributeError as e:
-            logger.warning(f"No 'Mutation' in schema for {module['name']}: {e}")
-    return mutations
+                logger.debug(f"Added Mutation from {module_config.name}")
+            else:
+                logger.debug(f"No Mutation class in {module_config.name} schema")
+
+        return mutations
+
+    def get_module_info(self) -> Dict[str, Any]:
+        """Get information about all modules."""
+        info = {
+            "total_modules": len(MODULES),
+            "enabled_modules": len([m for m in MODULES if m.enabled]),
+            "available_modules": [],
+            "unavailable_modules": [],
+            "modules_with_schema": [],
+            "modules_with_urls": [],
+        }
+
+        for module_config in MODULES:
+            if not module_config.enabled:
+                continue
+
+            module_info = {
+                "name": module_config.name,
+                "path": module_config.module,
+                "imported": False,
+                "has_schema": False,
+                "has_urls": False,
+                "has_query": False,
+                "has_mutation": False,
+            }
+
+            # Check if module can be imported
+            main_module = self._import_module_safely(
+                module_config.module, module_config.name
+            )
+            if main_module:
+                module_info["imported"] = True
+                info["available_modules"].append(module_info)
+
+                # Check schema
+                schema_module = self._get_schema_module(
+                    module_config.module, module_config.name
+                )
+                if schema_module:
+                    module_info["has_schema"] = True
+                    module_info["has_query"] = hasattr(schema_module, "Query")
+                    module_info["has_mutation"] = hasattr(schema_module, "Mutation")
+                    info["modules_with_schema"].append(module_config.name)
+
+                # Check URLs
+                try:
+                    url_module = importlib.import_module(f"{module_config.module}.urls")
+                    if hasattr(url_module, "urlpatterns"):
+                        module_info["has_urls"] = True
+                        info["modules_with_urls"].append(module_config.name)
+                except ImportError:
+                    pass
+
+            else:
+                info["unavailable_modules"].append(module_info)
+
+        return info
+
+
+# Create singleton instance
+_loader = ModuleLoader()
+
+
+# Simple functions for backward compatibility
+def get_module_list() -> List[str]:
+    """Get list of available module paths."""
+    return _loader.get_available_modules()
+
+
+def get_module_urls() -> List[Any]:
+    """Get URL patterns from all modules."""
+    return _loader.get_module_urls()
+
+
+def get_module_queries() -> List[Any]:
+    """Get GraphQL queries from all modules."""
+    return _loader.get_module_queries()
+
+
+def get_module_mutations() -> List[Any]:
+    """Get GraphQL mutations from all modules."""
+    return _loader.get_module_mutations()
+
+
+def get_module_info() -> Dict[str, Any]:
+    """Get detailed information about all modules."""
+    return _loader.get_module_info()
+
+
+# Helper function to disable/enable modules at runtime
+def set_module_enabled(module_name: str, enabled: bool) -> bool:
+    """Enable or disable a module by name."""
+    for module_config in MODULES:
+        if module_config.name == module_name:
+            module_config.enabled = enabled
+            # Clear cache to force re-evaluation
+            _loader._module_cache.clear()
+            _loader._schema_cache.clear()
+            return True
+    return False

@@ -1,9 +1,3 @@
-from .database import *
-from .logging import *
-from .authentication import *
-from .graphql import *
-
-
 from modules.core.module_loader import get_module_list
 import os
 from .. import BASE_DIR
@@ -106,3 +100,6 @@ AUTHENTICATION_BACKENDS = [
     "graphql_jwt.backends.JSONWebTokenBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+
+AUTH_USER_MODEL = "authentication.User"
