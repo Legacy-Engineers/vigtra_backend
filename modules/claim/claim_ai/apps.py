@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class BillingConfig(AppConfig):
+class ClaimAiConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "modules.payment.billing"
+    name = "modules.claim.claim_ai"

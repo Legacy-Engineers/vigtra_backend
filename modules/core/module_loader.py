@@ -28,11 +28,17 @@ MODULES = [
     ModuleConfig("Authentication", "modules.authentication"),
     ModuleConfig("FHIR API", "modules.fhir_api"),
     ModuleConfig("Contribution", "modules.contribution"),
-    ModuleConfig("ContributionPlan", "modules.contribution_plan"),
+    ModuleConfig("Contribution Plan", "modules.contribution_plan"),
     ModuleConfig("Formal Sector", "modules.formal_sector"),
-    ModuleConfig("Contract", "modules.formal_sector.contract"),
     ModuleConfig("Location", "modules.location"),
     ModuleConfig("Product", "modules.product"),
+    ModuleConfig("Preauthorization", "modules.preauthorization"),
+    ModuleConfig("Report", "modules.report"),
+    ModuleConfig("Payment", "modules.payment"),
+    ModuleConfig("Billing", "modules.payment.billing"),
+    ModuleConfig("Premium", "modules.payment.premium"),
+    ModuleConfig("Contract", "modules.contract"),
+    ModuleConfig("Service", "modules.service"),
 ]
 
 
