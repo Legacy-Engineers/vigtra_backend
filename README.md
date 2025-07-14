@@ -427,14 +427,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 Special thanks to the openIMIS community for their inspiration and dedication to improving healthcare systems worldwide.
 
-## Support
-
-For support and questions:
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/Vigtra/issues)
-- **Documentation**: [Project Wiki](https://github.com/yourusername/Vigtra/wiki)
-- **Email**: support@yourdomain.com
-
----
-
 **Note**: This project is under active development. Features and APIs may change between versions.
