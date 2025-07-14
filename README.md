@@ -64,7 +64,8 @@ The project follows a modular architecture with the following key components:
    # Or using traditional pip
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
+   pip install poetry
+   poetry install
    ```
 
 3. **Configure environment variables:**
