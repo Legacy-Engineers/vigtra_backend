@@ -25,6 +25,7 @@ dependencies = [
     "django-redis>=6.0.0",
     "django-guardian>=3.0.3",
     "faker>=37.4.0",
+    "tablib>=3.8.0",
 ]
 
 
