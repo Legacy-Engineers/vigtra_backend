@@ -26,6 +26,14 @@ dependencies = [
     "django-guardian>=3.0.3",
     "faker>=37.4.0",
     "tablib>=3.8.0",
+    "celery>=5.5.3",
+    "django-celery-results>=2.6.0",
+    "django-celery-beat>=2.8.1",
+    "plotly>=6.2.0",
+    "plotly-geo>=1.0.0",
+    "kaleido>=1.0.0",
+    "pandas>=2.3.1",
+    "dash>=3.1.1",
 ]
 
 
