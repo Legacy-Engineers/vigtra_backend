@@ -31,3 +31,5 @@ coverage.xml
 db.sqlite3
 logs/*
 logs
+
+uv.lock
