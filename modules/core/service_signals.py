@@ -1,4 +1,5 @@
 import logging
+import inspect
 from typing import Dict, Callable, Any, Optional
 from functools import wraps
 from django.dispatch import Signal
@@ -130,10 +131,20 @@ def register_signal(
         signal = signal_registry.get_or_create_signal(signal_name, providing_args)
 
         # Create a wrapper to preserve function metadata and add error handling
+        # Django signal receivers must accept **kwargs
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
-                return func(*args, **kwargs)
+                # Only pass the original function's expected arguments
+                # Django signals will pass additional kwargs that the original function might not expect
+                sig = inspect.signature(func)
+                # Filter kwargs to only include parameters that the original function accepts
+                filtered_kwargs = {}
+                for param_name, param in sig.parameters.items():
+                    if param_name in kwargs:
+                        filtered_kwargs[param_name] = kwargs[param_name]
+
+                return func(*args, **filtered_kwargs)
             except Exception as e:
                 logger.error(
                     f"Error in signal receiver '{func.__name__}' for signal '{signal_name}': {e}"

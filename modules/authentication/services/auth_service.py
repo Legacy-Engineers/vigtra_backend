@@ -8,11 +8,11 @@ logger = logging.getLogger(__name__)
 
 
 class AuthService:
-    def __init__(self, user):
+    def __init__(self, user: User = None):
         self.user = user
 
     @register_signal("auth_service.create_or_update")
-    def create_or_update(self, data: dict) -> Dict[str, bool | str | dict]:
+    def create_or_update(self, data: dict, **kwargs) -> Dict[str, bool | str | dict]:
         user_uuid = data.get("uuid")
 
         if user_uuid:
@@ -21,7 +21,7 @@ class AuthService:
             return self.create(data=data)
 
     @register_signal("auth_service.create_user")
-    def create(self, data: dict) -> Dict[str, bool | str | dict]:
+    def create(self, data: dict, **kwargs) -> Dict[str, bool | str | dict]:
         try:
             validate_user = self._validate_new_user(data=data)
             if not validate_user.get("success"):
@@ -85,7 +85,7 @@ class AuthService:
         return vigtra_message(success=True, message="Validation successful.")
 
     @register_signal("auth_service.update_user")
-    def update(self, data: dict) -> Dict[str, bool | str | dict]:
+    def update(self, data: dict, **kwargs) -> Dict[str, bool | str | dict]:
         try:
             current_user = User.objects.get(uuid=data.get("uuid"))
             for key, value in data.items():

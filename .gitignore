@@ -33,3 +33,4 @@ logs/*
 logs
 
 uv.lock
+extra_settings.yaml

@@ -2,14 +2,20 @@ import graphene
 from .module_loader import get_module_queries, get_module_mutations
 from .gql import gql_queries
 from graphene_django.filter import DjangoFilterConnectionField
+from vigtra.extra_settings import ExtraSettings
 
 
 def create_schema():
     """Create GraphQL schema with dynamic module loading."""
 
+    extra_modules = ExtraSettings.get_extra_modules()
     # Get all module queries and mutations
     all_queries = get_module_queries()
     all_mutations = get_module_mutations()
+
+    # Get all extra module queries and mutations
+    all_queries.extend(extra_modules["app_schema_queries"])
+    all_mutations.extend(extra_modules["app_schema_mutations"])
 
     class Query(*all_queries, graphene.ObjectType):
         """Main GraphQL Query with all module queries."""

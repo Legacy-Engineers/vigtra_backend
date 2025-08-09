@@ -4,7 +4,7 @@ import graphene
 
 
 class Query(graphene.ObjectType):
-    policys = DjangoFilterConnectionField(gql_queries.PolicyGQLType)
+    policies = DjangoFilterConnectionField(gql_queries.PolicyGQLType)
 
 
 schema = graphene.Schema(query=Query)

@@ -34,6 +34,7 @@ dependencies = [
     "kaleido>=1.0.0",
     "pandas>=2.3.1",
     "dash>=3.1.1",
+    "pyaml>=25.7.0",
 ]
 
 

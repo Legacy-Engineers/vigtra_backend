@@ -2,6 +2,7 @@ from modules.core.module_loader import get_module_list
 import os
 from pathlib import Path
 from .. import BASE_DIR
+from ..extra_settings import ExtraSettings
 
 INSTALLED_APPS = [
     # Modules
@@ -13,7 +14,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Third-party apps
+]
+
+THIRD_PARTY_APPS = [
     "guardian",
     "corsheaders",
     "graphene_django",
@@ -24,7 +27,10 @@ INSTALLED_APPS = [
     "simple_history",
 ]
 
-INSTALLED_APPS += get_module_list()
+INSTALLED_APPS += (
+    get_module_list() + THIRD_PARTY_APPS + ExtraSettings.get_extra_third_party_apps()
+)
+INSTALLED_APPS += ExtraSettings.get_extra_templates()
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -34,25 +40,32 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # Third party
+]
+
+# Third party middleware
+THIRD_PARTY_MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "axes.middleware.AxesMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
+
+MIDDLEWARE += THIRD_PARTY_MIDDLEWARE + ExtraSettings.get_extra_third_party_middleware()
+
 
 ROOT_URLCONF = "vigtra.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates/"],
+        "DIRS": [BASE_DIR / "templates/"] + ExtraSettings.get_extra_templates(),
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-            ],
+            ]
+            + ExtraSettings.get_extra_context_processors(),
         },
     },
 ]
@@ -102,7 +115,7 @@ AUTHENTICATION_BACKENDS = [
     "graphql_jwt.backends.JSONWebTokenBackend",
     "django.contrib.auth.backends.ModelBackend",
     "guardian.backends.ObjectPermissionBackend",
-]
+] + ExtraSettings.get_extra_auth_backends()
 
 
 # User Auth Model
@@ -122,10 +135,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
 
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB

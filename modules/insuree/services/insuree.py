@@ -12,7 +12,7 @@ class InsureeService:
         pass
 
     @register_signal("insuree_service.create_or_update_insuree")
-    def create_or_update(self, data: dict) -> Dict[str, bool | dict | str]:
+    def create_or_update(self, data: dict, **kwargs) -> Dict[str, bool | dict | str]:
         uuid = data.get("uuid")
 
         if uuid:
@@ -38,7 +38,7 @@ class InsureeService:
             )
 
     @register_signal("insuree_service.update_insuree")
-    def update_insuree(self, data: dict) -> Dict[str, bool | str | dict]:
+    def update_insuree(self, data: dict, **kwargs) -> Dict[str, bool | str | dict]:
         try:
             uuid = data.get("uuid")
             current_insuree = Insuree.objects.get(uuid=uuid)
