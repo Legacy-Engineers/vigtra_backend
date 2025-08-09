@@ -24,6 +24,17 @@ def create_schema():
         change_logs = DjangoFilterConnectionField(
             gql_queries.ChangeLogGQLType, description="Query change logs with filtering"
         )
+        crud_events = DjangoFilterConnectionField(
+            gql_queries.CRUDEventGQLType, description="Query CRUD events with filtering"
+        )
+        login_events = DjangoFilterConnectionField(
+            gql_queries.LoginEventGQLType,
+            description="Query login events with filtering",
+        )
+        request_events = DjangoFilterConnectionField(
+            gql_queries.RequestEventGQLType,
+            description="Query request events with filtering",
+        )
 
         # Health check
         health = graphene.String(description="API health check")

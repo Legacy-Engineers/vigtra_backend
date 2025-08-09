@@ -35,3 +35,5 @@ logs
 uv.lock
 extra_settings.yaml
 poetry.lock
+
+vigtra_core_config.yaml

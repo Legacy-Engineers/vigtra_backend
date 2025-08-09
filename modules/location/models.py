@@ -125,6 +125,16 @@ class Location(MPTTModel):
         return self.get_descendants().filter(is_active=True).count()
 
 
+class HealthFacilityQualityAssuranceChoices(models.TextChoices):
+    """
+    Choices for health facility quality assurance status.
+    """
+
+    ACCREDITED = "accredited", "Accredited"
+    NON_ACCREDITED = "non_accredited", "Non-Accredited"
+    IN_PROGRESS = "in_progress", "In Progress"
+
+
 class HealthFacilityType(models.Model):
     """
     Defines types of health facilities (e.g., Hospital, Clinic, Health Center).
