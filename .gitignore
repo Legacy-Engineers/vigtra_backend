@@ -34,3 +34,4 @@ logs
 
 uv.lock
 extra_settings.yaml
+poetry.lock
