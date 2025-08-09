@@ -57,3 +57,12 @@ def get_data_from_file(file_path: str, file_type: str) -> dict:
 
     else:
         raise ValueError("File type not supported. Only JSON files are supported.")
+
+
+def prefix_filterset(prefix, filterset):
+    if type(filterset) is dict:
+        return {(prefix + k): v for k, v in filterset.items()}
+    elif type(filterset) is list:
+        return [(prefix + x) for x in filterset]
+    else:
+        return filterset

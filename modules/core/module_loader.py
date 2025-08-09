@@ -39,6 +39,7 @@ MODULES = [
     ModuleConfig("Premium", "modules.payment.premium"),
     ModuleConfig("Contract", "modules.contract"),
     ModuleConfig("Service", "modules.service"),
+    ModuleConfig("Medical", "modules.medical"),
 ]
 
 

@@ -44,3 +44,14 @@ class VersionedModel(BaseVersionedModel):
 
     class Meta:
         abstract = True
+
+
+class BaseCodeModel(models.Model):
+    """Abstract base model for code-based lookup tables."""
+
+    class Meta:
+        abstract = True
+        ordering = ["code"]
+
+    def __str__(self):
+        return f"{self.code} - {getattr(self, 'name', getattr(self, 'description', self.code))}"
