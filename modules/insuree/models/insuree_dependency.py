@@ -75,7 +75,7 @@ class Profession(models.Model):
         db_table = "tblProfessions"
         verbose_name = _("Profession")
         verbose_name_plural = _("Professions")
-        ordering = ["sort_order", "profession"]
+        ordering = ["profession"]
         indexes = [
             models.Index(fields=["profession"], name="idx_profession_name"),
             models.Index(fields=["is_active"], name="idx_profession_active"),
@@ -130,6 +130,9 @@ class IdentificationType(models.Model):
     )
     name = models.CharField(
         max_length=100,
+        blank=True,
+        null=True,
+        help_text=_("Identification type name"),
     )
     regex = models.TextField(
         blank=True,
