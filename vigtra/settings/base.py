@@ -5,6 +5,9 @@ from .. import BASE_DIR
 from ..extra_settings import ExtraSettings
 
 INSTALLED_APPS = [
+    # Third party apps
+    "daphne",
+    "jazzmin",
     # Modules
     "modules.core",
     # Default Django APPS
@@ -17,6 +20,7 @@ INSTALLED_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "django_eventstream",
     "guardian",
     "corsheaders",
     "graphene_django",
@@ -26,6 +30,10 @@ THIRD_PARTY_APPS = [
     "django_lifecycle_checks",
     "simple_history",
     "easyaudit",
+    "rest_framework",
+    "rest_framework_api_key",
+    # For development
+    "debug_toolbar",
 ]
 
 INSTALLED_APPS += (
@@ -42,6 +50,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "easyaudit.middleware.easyaudit.EasyAuditMiddleware",
+    # For development
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 # Third party middleware
@@ -73,7 +83,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "vigtra.wsgi.application"
-
+ASGI_APPLICATION = "vigtra.asgi.application"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -172,3 +182,14 @@ if not DEBUG:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 """
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+        "django_eventstream.renderers.SSEEventRenderer",
+        "django_eventstream.renderers.BrowsableAPIEventStreamRenderer",
+    ],
+}

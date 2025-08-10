@@ -82,6 +82,9 @@ class ConfigManager:
 
     @classmethod
     def get_config_data(cls):
+        # Ensure config file exists before reading
+        cls.initialize_config()
+
         config_data = None
 
         with open(VIGTRA_CONFIG_FILE, "r") as f:
@@ -118,3 +121,13 @@ class ConfigManager:
     def get_insuree_config(cls):
         config_data = cls.get_config_data()
         return config_data.get("insuree", {})
+
+    @classmethod
+    def get_authentication_config(cls):
+        config_data = cls.get_config_data()
+        return config_data.get("authentication", {})
+
+    @classmethod
+    def get_payment_gateway_config(cls):
+        config_data = cls.get_config_data()
+        return config_data.get("payment_gateway", {})

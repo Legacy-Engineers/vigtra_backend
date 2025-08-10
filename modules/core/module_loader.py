@@ -40,6 +40,7 @@ MODULES = [
     ModuleConfig("Contract", "modules.contract"),
     ModuleConfig("Service", "modules.service"),
     ModuleConfig("Medical", "modules.medical"),
+    ModuleConfig("Notification Hub", "modules.notification_hub"),
 ]
 
 
@@ -80,6 +81,28 @@ class ModuleLoader:
             logger.debug(f"No schema module found for {module_name}")
             return None
 
+    def _get_websockets(self) -> List:
+        """Get websocket patterns from all modules."""
+        websocket_urls = []
+
+        for module_config in MODULES:
+            if not module_config.enabled:
+                continue
+
+            try:
+                websocket_module = importlib.import_module(
+                    f"{module_config.module}.websockets"
+                )
+
+                if hasattr(websocket_module, "websocket_urlpatterns"):
+                    websocket_urls.extend(websocket_module.websocket_urlpatterns)
+            except ImportError:
+                # Module doesn't have websockets support, skip silently
+                logger.debug(f"No websockets module for {module_config.name}")
+                continue
+
+        return websocket_urls
+
     def get_available_modules(self) -> List[str]:
         """Get list of successfully imported module paths."""
         modules = []
@@ -112,17 +135,21 @@ class ModuleLoader:
                 url_module = importlib.import_module(f"{module_config.module}.urls")
                 app_module = importlib.import_module(f"{module_config.module}.apps")
 
-                # Check for required attributes
-                if not hasattr(url_module, "urlpatterns"):
+                # Check for required attributes - use getattr for safer access
+                urlpatterns = getattr(url_module, "urlpatterns", None)
+                if urlpatterns is None:
                     logger.debug(f"No urlpatterns in {module_config.name}")
                     continue
 
                 # Get URL prefix
-                url_prefix = getattr(
-                    app_module, "URL_PREFIX", module_config.name.lower()
-                )
+                if hasattr(app_module, "URL_PREFIX"):
+                    url_prefix = getattr(
+                        app_module, "URL_PREFIX", module_config.name.lower()
+                    )
+                else:
+                    url_prefix = module_config.name.lower()
 
-                url_pattern = path(f"{url_prefix}/", include(url_module.urlpatterns))
+                url_pattern = path(f"{url_prefix}/", include(urlpatterns))
                 urls.append(url_pattern)
 
                 logger.debug(
@@ -133,6 +160,10 @@ class ModuleLoader:
                 logger.debug(f"No URL module for {module_config.name}: {e}")
             except AttributeError as e:
                 logger.debug(f"Missing URL attributes in {module_config.name}: {e}")
+            except Exception as e:
+                logger.warning(
+                    f"Unexpected error processing URLs for {module_config.name}: {e}"
+                )
 
         return urls
 
