@@ -112,6 +112,14 @@ class FamilyMembership(core_models.VersionedModel, LifecycleModel):
         auto_now=True, help_text=_("Date membership was last modified")
     )
 
+    is_valid = models.BooleanField(
+        default=True, help_text=_("Whether this membership is valid")
+    )
+
+    has_claim_benefits = models.BooleanField(
+        default=False, help_text=_("Whether this membership has claim benefits")
+    )
+
     audit_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

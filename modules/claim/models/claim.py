@@ -3,7 +3,7 @@ from modules.core.models.openimis_core_models import UUIDModel
 from modules.insuree.models import Insuree
 from modules.location.models import HealthFacility
 from modules.medical.models.diagnosis import Diagnosis
-import uuid
+from modules.claim.utils import claim_code_generator
 
 
 class VisitType(models.TextChoices):
@@ -19,10 +19,6 @@ class ClaimStatus(models.TextChoices):
     REVIEWED = "reviewed", "Reviewed"
     APPROVED = "approved", "Approved"
     REJECTED = "rejected", "Rejected"
-
-
-def claim_code_generator():
-    return "CLM-" + str(uuid.uuid4())[:8].upper()
 
 
 class Claim(UUIDModel):

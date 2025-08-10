@@ -16,12 +16,6 @@ DEFAULT_VIGTRA_CONFIG_DATA = {
         "contact_address": "123 Main St, Nairobi, Kenya",
         "contact_website": "https://www.vigtra.com",
     },
-    "claim": {
-        "use_claim_filter": True,
-        "extra_filters": [
-            "claim_type",
-        ],
-    },
     "use_qa_accreditation": True,
     "use_mail_manager": True,
     "health_facility": {
@@ -46,6 +40,26 @@ DEFAULT_VIGTRA_CONFIG_DATA = {
         "token_url": "https://fhir.example.com/token",
         "authorization_url": "https://fhir.example.com/authorize",
         "scopes": ["openid", "profile", "email", "offline_access"],
+    },
+    "insuree": {
+        "chf_config": {
+            "prefix": "CHF",
+            "auto_generate": True,
+            "regex": None,
+            "length": 10,
+        },
+        "extra_filters": [],
+        "validation_rules": {
+            "identification_regex": None,
+        },
+        "max_age_of_majority": 18,
+    },
+    "claim": {
+        "code_config": {
+            "prefix": "CLM",
+            "auto_generate": True,
+            "length": 10,
+        },
     },
 }
 
@@ -90,3 +104,8 @@ class ConfigManager:
     def get_fhir_config(cls):
         config_data = cls.get_config_data()
         return config_data.get("fhir_config", {})
+
+    @classmethod
+    def get_insuree_config(cls):
+        config_data = cls.get_config_data()
+        return config_data.get("insuree", {})

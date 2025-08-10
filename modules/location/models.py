@@ -4,6 +4,10 @@ from django.core.exceptions import ValidationError
 from mptt.models import MPTTModel, TreeForeignKey
 from guardian.models import BaseObjectPermission
 
+from modules.core.models.openimis_core_models import UUIDModel
+from simple_history.models import HistoricalRecords
+from datetime import datetime
+
 
 class LocationType(models.Model):
     """
@@ -158,7 +162,7 @@ class HealthFacilityType(models.Model):
         return self.name
 
 
-class HealthFacility(models.Model):
+class HealthFacility(UUIDModel):
     """
     Represents a health facility with its location and operational details.
     """
@@ -213,8 +217,13 @@ class HealthFacility(models.Model):
         verbose_name="Established Date",
         help_text="Date when the facility was established",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+
+    validity_from = models.DateTimeField(db_column="ValidityFrom", default=datetime.now)
+    validity_to = models.DateTimeField(db_column="ValidityTo", blank=True, null=True)
+
+    history = HistoricalRecords()
 
     class Meta:
         db_table = "tblHealthFacilities"

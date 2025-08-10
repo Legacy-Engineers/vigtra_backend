@@ -1,9 +1,14 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from modules.core.models.openimis_core_models import BaseCodeModel
-import os
+from modules.core.config_manager import ConfigManager
 
-AGE_OF_MAJORITY = int(os.getenv("AGE_OF_MAJORITY", 18))
+
+insuree_config = ConfigManager.get_insuree_config()
+
+AGE_OF_MAJORITY = insuree_config.get(
+    "max_age_of_majority", 18
+)  # Defaulting the value to 18 incase the configuration was removed
 
 
 class Gender(BaseCodeModel):
@@ -64,9 +69,6 @@ class Profession(models.Model):
     is_active = models.BooleanField(
         default=True, help_text=_("Whether profession is active")
     )
-    sort_order = models.PositiveSmallIntegerField(
-        default=0, help_text=_("Sort order for display")
-    )
 
     class Meta:
         managed = True
@@ -122,27 +124,32 @@ class IdentificationType(models.Model):
     """Enhanced Identification Type model."""
 
     code = models.CharField(
-        db_column="IdentificationCode",
         primary_key=True,
-        max_length=10,  # Increased length
+        max_length=10,
         help_text=_("Identification type code"),
     )
-    identification_type = models.CharField(
-        db_column="IdentificationTypes",
-        max_length=100,  # Increased length
-        help_text=_("Identification type description"),
+    name = models.CharField(
+        max_length=100,
+    )
+    regex = models.TextField(
+        blank=True,
+        null=True,
+        help_text=_("Regular expression for validation"),
+    )
+    prefix = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text=_("Prefix for the identification code"),
+    )
+    suffix = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text=_("Suffix for the identification code"),
     )
     is_active = models.BooleanField(
         default=True, help_text=_("Whether identification type is active")
-    )
-    requires_validation = models.BooleanField(
-        default=False, help_text=_("Whether this ID type requires validation")
-    )
-    validation_regex = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True,
-        help_text=_("Regex pattern for validation"),
     )
 
     class Meta:
@@ -150,14 +157,14 @@ class IdentificationType(models.Model):
         db_table = "tblIdentificationTypes"
         verbose_name = _("Identification Type")
         verbose_name_plural = _("Identification Types")
-        ordering = ["identification_type"]
+        ordering = ["name"]
         indexes = [
             models.Index(fields=["code"], name="idx_id_type_code"),
             models.Index(fields=["is_active"], name="idx_id_type_active"),
         ]
 
     def __str__(self):
-        return f"{self.code} - {self.identification_type}"
+        return f"{self.code} - {self.name}"
 
 
 class Relation(models.Model):

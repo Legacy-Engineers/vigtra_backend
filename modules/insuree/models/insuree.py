@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import RegexValidator
 from django.db.models import Q
 from django_lifecycle import LifecycleModel, hook, BEFORE_SAVE
 import uuid
@@ -18,6 +17,7 @@ from modules.location import models as location_models
 from .insuree_dependency import AGE_OF_MAJORITY
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class InsureeStatus(models.TextChoices):
@@ -182,14 +182,6 @@ class Insuree(
         blank=True,
         null=True,
         help_text=_("Passport number"),
-    )
-
-    # Enhanced phone validation
-    phone_regex = RegexValidator(
-        regex=r"^\+?1?\d{9,15}",
-        message=_(
-            "Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
-        ),
     )
 
     profession = models.ForeignKey(
@@ -444,14 +436,7 @@ class Insuree(
     def __str__(self):
         return f"{self.chf_id or 'No CHF ID'} - {self.full_name}"
 
-    phone = models.CharField(
-        db_column="Phone",
-        validators=[phone_regex],
-        max_length=17,
-        blank=True,
-        null=True,
-        help_text=_("Phone number"),
-    )
+    phone = PhoneNumberField(blank=True, null=True, help_text=_("Phone number"))
 
     # Enhanced email validation
     email = models.EmailField(
