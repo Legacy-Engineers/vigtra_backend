@@ -3,6 +3,7 @@ from modules.core.service_signals import register_signal
 from modules.core.utils import vigtra_message
 from ..models import User
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -29,12 +30,24 @@ class AuthService:
 
             new_user = User.objects.create_user(**data)
             return vigtra_message(
-                data=new_user.__dict__, message="User created successfully."
+                success=True,
+                data=new_user.__dict__,
+                message="User created successfully.",
             )
         except Exception as ex:
-            return vigtra_message(data=data, message=f"Unexpected error: {ex}")
+            tb_str = traceback.format_exc()
+            return vigtra_message(
+                data=data,
+                message=f"Unexpected error: {ex}",
+                error_details=[str(ex), tb_str],
+            )
 
     def _validate_new_user(self, data: dict) -> Dict[str, bool | str | dict]:
+        required_fields = ["username", "email", "password"]
+        for field in required_fields:
+            if not data.get(field):
+                return vigtra_message(success=False, message=f"{field} is required.")
+
         username = data.get("username")
         email = data.get("email")
         password = data.get("password")
@@ -82,7 +95,10 @@ class AuthService:
                 message="Password must contain at least one special character.",
             )
 
-        return vigtra_message(success=True, message="Validation successful.")
+        return vigtra_message(
+            success=True,
+            message="Validation successful.",
+        )
 
     @register_signal("auth_service.update_user")
     def update(self, data: dict, **kwargs) -> Dict[str, bool | str | dict]:
@@ -93,11 +109,28 @@ class AuthService:
                     setattr(current_user, key, value)
             current_user.save()
             return vigtra_message(
-                data=current_user.__dict__, message="User updated successfully."
+                success=True,
+                data=current_user.__dict__,
+                message="User updated successfully.",
             )
         except User.DoesNotExist:
-            return vigtra_message(data=data, message="User not found.")
+            logger.error(f"User not found: {data}")
+            return vigtra_message(
+                data=data,
+                message="User not found.",
+                error_details=[traceback.format_exc()],
+            )
         except ValueError as va:
-            return vigtra_message(data=data, message=f"Value error: {va}")
+            logger.error(f"Value error: {va}")
+            return vigtra_message(
+                data=data,
+                message=f"Value error: {va}",
+                error_details=[str(va), traceback.format_exc()],
+            )
         except Exception as ex:
-            return vigtra_message(data=data, message=f"An unexpected error: {ex}")
+            logger.error(f"An unexpected error: {ex}")
+            return vigtra_message(
+                data=data,
+                message=f"An unexpected error: {ex}",
+                error_details=[str(ex), traceback.format_exc()],
+            )

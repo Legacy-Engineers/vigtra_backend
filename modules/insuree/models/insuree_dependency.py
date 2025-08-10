@@ -97,9 +97,6 @@ class Education(models.Model):
     code = models.CharField(
         max_length=10, unique=True, blank=True, null=True, help_text=_("Education code")
     )
-    level = models.PositiveSmallIntegerField(
-        default=0, help_text=_("Education level rank")
-    )
     is_active = models.BooleanField(
         default=True, help_text=_("Whether education level is active")
     )
@@ -109,10 +106,9 @@ class Education(models.Model):
         db_table = "tblEducations"
         verbose_name = _("Education")
         verbose_name_plural = _("Education Levels")
-        ordering = ["level", "education"]
+        ordering = ["education"]
         indexes = [
             models.Index(fields=["education"], name="idx_education_name"),
-            models.Index(fields=["level"], name="idx_education_level"),
             models.Index(fields=["is_active"], name="idx_education_active"),
         ]
 
@@ -187,16 +183,13 @@ class Relation(models.Model):
     is_active = models.BooleanField(
         default=True, help_text=_("Whether relationship is active")
     )
-    sort_order = models.PositiveSmallIntegerField(
-        default=0, help_text=_("Sort order for display")
-    )
 
     class Meta:
         managed = True
         db_table = "tblRelations"
         verbose_name = _("Relation")
         verbose_name_plural = _("Relations")
-        ordering = ["sort_order", "relation"]
+        ordering = ["relation"]
         indexes = [
             models.Index(fields=["relation"], name="idx_relation_name"),
             models.Index(fields=["is_active"], name="idx_relation_active"),

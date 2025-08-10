@@ -21,16 +21,16 @@ class ModuleConfig:
 
 # Module configuration - easier to manage
 MODULES = [
+    ModuleConfig("Authentication", "modules.authentication"),
+    ModuleConfig("Location", "modules.location"),
     ModuleConfig("Insuree", "modules.insuree"),
     ModuleConfig("Policy", "modules.policy"),
     ModuleConfig("Claim", "modules.claim"),
     ModuleConfig("Claim AI", "modules.claim.claim_ai"),
-    ModuleConfig("Authentication", "modules.authentication"),
     ModuleConfig("FHIR API", "modules.fhir_api"),
     ModuleConfig("Contribution", "modules.contribution"),
     ModuleConfig("Contribution Plan", "modules.contribution_plan"),
     ModuleConfig("Formal Sector", "modules.formal_sector"),
-    ModuleConfig("Location", "modules.location"),
     ModuleConfig("Product", "modules.product"),
     ModuleConfig("Preauthorization", "modules.preauthorization"),
     ModuleConfig("Report", "modules.report"),

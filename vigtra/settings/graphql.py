@@ -1,5 +1,9 @@
 import os
 import logging
+import secrets
+from datetime import timedelta
+
+SECRET_KEY = secrets.token_urlsafe(50)
 
 logger = logging.getLogger(__name__)
 
@@ -71,29 +75,6 @@ GRAPHENE = {
     # "CONTEXT": "modules.core.graphql.context.get_context",
 }
 
-# GraphQL JWT settings
-GRAPHQL_JWT = {
-    "JWT_ALGORITHM": "HS256",
-    "JWT_AUDIENCE": None,
-    "JWT_ISSUER": None,
-    "JWT_LEEWAY": 0,
-    "JWT_SECRET_KEY": os.getenv("JWT_SECRET_KEY", os.getenv("SECRET_KEY")),
-    "JWT_VERIFY": True,
-    "JWT_VERIFY_EXPIRATION": True,
-    "JWT_EXPIRATION_DELTA": int(os.getenv("JWT_EXPIRATION_MINUTES", "60")),  # minutes
-    "JWT_REFRESH_EXPIRATION_DELTA": int(os.getenv("JWT_REFRESH_DAYS", "7")),  # days
-    "JWT_ALLOW_REFRESH": True,
-    "JWT_REFRESH_TOKEN_N_BYTES": 20,
-    "JWT_AUTH_HEADER_PREFIX": "Bearer",
-    # Cookie settings for web clients
-    "JWT_COOKIE_NAME": "jwt-token",
-    "JWT_COOKIE_SECURE": ENVIRONMENT == "production",
-    "JWT_COOKIE_HTTP_ONLY": True,
-    "JWT_COOKIE_SAMESITE": "Lax",
-    # Token refresh settings
-    "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
-    "JWT_DELETE_STALE_BLACKLISTED_TOKENS": True,
-}
 
 # CORS settings for GraphQL
 if ENVIRONMENT == "development":
@@ -109,6 +90,34 @@ else:
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_URLS_REGEX = r"^/graphql.*$"
+
+GRAPHQL_JWT = {
+    # Auto-generate temporary JWT secret for development
+    "JWT_SECRET_KEY": secrets.token_urlsafe(32),
+    # Token expiration settings
+    "JWT_EXPIRATION_DELTA": timedelta(minutes=60),
+    "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
+    "JWT_VERIFY_EXPIRATION": True,
+    # Refresh token settings (fully enabled)
+    "JWT_ALLOW_REFRESH": True,
+    "JWT_REFRESH_TOKEN_N_BYTES": 20,
+    "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
+    "JWT_DELETE_STALE_BLACKLISTED_TOKENS": True,
+    # Authentication settings
+    "JWT_AUTH_HEADER_TYPES": ("Bearer",),
+    "JWT_AUTH_HEADER_PREFIX": "Bearer",
+    "JWT_VERIFY": True,
+    "JWT_ALGORITHM": "HS256",
+    # Cookie settings for web clients
+    "JWT_COOKIE_NAME": "jwt-token",
+    "JWT_COOKIE_SECURE": False,  # False for development (HTTP)
+    "JWT_COOKIE_HTTP_ONLY": True,
+    "JWT_COOKIE_SAMESITE": "Lax",
+    # Additional settings for refresh tokens
+    "JWT_BLACKLIST_ENABLED": True,
+    "JWT_BLACKLIST_TOKEN_CHECKS": ["refresh"],
+    "JWT_REFRESH_TOKEN_MODEL": "graphql_jwt.RefreshToken",
+}
 
 logger.info(f"GraphQL configured for {ENVIRONMENT} environment")
 logger.info(f"GraphQL Debug: {GRAPHQL_DEBUG}")

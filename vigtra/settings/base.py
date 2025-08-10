@@ -4,6 +4,7 @@ from pathlib import Path
 from .. import BASE_DIR
 from ..extra_settings import ExtraSettings
 
+
 INSTALLED_APPS = [
     # Third party apps
     "daphne",

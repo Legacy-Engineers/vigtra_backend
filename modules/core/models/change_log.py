@@ -372,8 +372,16 @@ class ChangeLog(models.Model):
         }
 
         if object_instance:
+            # Set content_type and object_id for the GenericForeignKey
+            from django.contrib.contenttypes.models import ContentType
+
+            content_type = ContentType.objects.get_for_model(object_instance)
             log_data.update(
-                {"content_object": object_instance, "object_repr": str(object_instance)}
+                {
+                    "content_type": content_type,
+                    "object_id": object_instance.pk,
+                    "object_repr": str(object_instance),
+                }
             )
 
         log_data.update(kwargs)

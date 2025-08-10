@@ -8,6 +8,7 @@ from modules.location.models import HealthFacility
 import logging
 from datetime import date
 import re
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -36,18 +37,28 @@ class InsureeService:
 
             validated_data = insuree_validation.get("data")
             validated_data["audit_user"] = user
-            new_insuree = Insuree().objects.create(**validated_data)
+            other_health_facilities = validated_data.pop("other_health_facilities")
+            new_insuree: Insuree = Insuree.objects.create(**validated_data)
+
+            if other_health_facilities:
+                for health_facility in other_health_facilities:
+                    new_insuree.other_health_facilities.set(health_facility)
 
             if new_insuree:
                 return vigtra_message(
                     success=True,
                     message="Successfully created!",
-                    data=new_insuree.__dict__,
+                    data=new_insuree,
                 )
         except Exception as exc:
-            logger.debug(f"Failed to create insuree data {data}, EXCEPTION: {exc}")
+            tb_str = traceback.format_exc()
+            logger.debug(
+                f"Failed to create insuree data {data}, EXCEPTION: {exc}\nTRACEBACK:\n{tb_str}"
+            )
             return vigtra_message(
-                message="An unexpected error occured", error_details=[exc], data=data
+                message="An unexpected error occured",
+                error_details=[str(exc), tb_str],
+                data=data,
             )
 
     @register_signal("insuree_service.validate_and_parse_create_insuree_data")
@@ -55,6 +66,21 @@ class InsureeService:
         self, data: dict, **kwargs
     ) -> Dict[str, bool | dict | str]:
         try:
+            required_fields = [
+                "last_name",
+                "other_names",
+                "dob",
+                "gender_code",
+                "location_id",
+            ]
+            for field in required_fields:
+                if not data.get(field):
+                    return vigtra_message(
+                        message=f"Missing required field: {field}",
+                        data=data,
+                        error_details=[f"Missing required field: {field}"],
+                    )
+
             auto_generate_chf_id = data.pop("auto_generate_chf_id", True)
             gender_code = data.pop("gender_code", None)
             health_facility_code = data.pop("health_facility_code", None)
@@ -63,13 +89,6 @@ class InsureeService:
             )
             other_health_facility_codes = data.pop("other_health_facility_codes", [])
             status = data.get("status", None)
-
-            required_fields = ["first_name", "last_name", "dob", "gender_code", "dob"]
-            for field in required_fields:
-                if not data.get(field):
-                    return vigtra_message(
-                        message=f"Missing required field: {field}", data=data
-                    )
 
             if status:
                 data["status_date"] = date.today()
@@ -84,7 +103,11 @@ class InsureeService:
 
             gender = self._validate_gender_code(gender_code)
             if not gender:
-                return vigtra_message(message="Invalid gender code", data=data)
+                return vigtra_message(
+                    message="Invalid gender code",
+                    data=data,
+                    error_details=[f"Invalid gender code {gender_code}"],
+                )
             else:
                 data["gender"] = gender
 
@@ -94,7 +117,11 @@ class InsureeService:
                 )
                 if not health_facility:
                     return vigtra_message(
-                        message="Invalid health facility code", data=data
+                        message="Invalid health facility code",
+                        data=data,
+                        error_details=[
+                            f"Invalid health facility code {health_facility_code}"
+                        ],
                     )
                 else:
                     data["health_facility"] = health_facility
@@ -105,7 +132,11 @@ class InsureeService:
                 )
                 if not secondary_health_facility:
                     return vigtra_message(
-                        message="Invalid secondary health facility code", data=data
+                        message="Invalid secondary health facility code",
+                        data=data,
+                        error_details=[
+                            f"Invalid secondary health facility code {secondary_health_facility_code}"
+                        ],
                     )
                 else:
                     data["secondary_health_facility"] = secondary_health_facility
@@ -120,6 +151,9 @@ class InsureeService:
                         return vigtra_message(
                             message=f"Invalid other health facility code {code}",
                             data=data,
+                            error_details=[
+                                f"Invalid other health facility code {code}"
+                            ],
                         )
 
             data["other_health_facilities"] = other_health_facilities
@@ -135,10 +169,19 @@ class InsureeService:
             )
 
     def _validate_gender_code(self, gender_code: str) -> bool:
-        gender_obj = Gender.objects.get(code=gender_code)
-        if gender_obj:
-            return gender_obj
-        else:
+        try:
+            gender_obj = Gender.objects.get(code=gender_code)
+            if gender_obj:
+                return gender_obj
+            else:
+                return None
+        except Gender.DoesNotExist:
+            logger.debug(f"Gender code {gender_code} does not exist")
+            return None
+        except Exception as exc:
+            logger.debug(
+                f"Failed to validate gender code {gender_code}, EXCEPTION: {exc}"
+            )
             return None
 
     def _validate_health_facility_code(self, health_facility_code: str) -> bool:

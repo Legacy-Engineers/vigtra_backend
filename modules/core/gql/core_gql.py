@@ -12,6 +12,7 @@ from modules.core.models.change_log import (
     APIType,
     ActionType,
 )
+from django.contrib.contenttypes.models import ContentType
 
 logger = logging.getLogger(__name__)
 
@@ -388,6 +389,28 @@ class CoreMutation(graphene.Mutation, metaclass=CoreMutationMeta):
             else:
                 request_result_type = RequestResultType.SERVER_ERROR
 
+            # Extract content object information if available
+            content_type = None
+            object_id = None
+            if result.success and result.data:
+                # Handle case where result.data is a Django model instance directly
+                if hasattr(result.data, "_meta") and hasattr(result.data, "pk"):
+                    # result.data is a Django model instance
+                    content_type = ContentType.objects.get_for_model(result.data)
+                    object_id = result.data.pk
+                elif isinstance(result.data, dict):
+                    # result.data is a dictionary, look for model instances within it
+                    for key, value in result.data.items():
+                        if hasattr(value, "_meta") and hasattr(value, "pk"):
+                            # This looks like a Django model instance
+                            content_type = ContentType.objects.get_for_model(value)
+                            object_id = value.pk
+                            break
+                        elif isinstance(value, dict) and "uuid" in value:
+                            # This might be a serialized object with UUID
+                            # We'll need to get the actual model instance
+                            pass
+
             # Create change log entry
             ChangeLog.objects.create(
                 module=cls._mutation_module,
@@ -410,6 +433,8 @@ class CoreMutation(graphene.Mutation, metaclass=CoreMutationMeta):
                 user=user,
                 request_header=sanitize_meta(request_meta),
                 session_key=getattr(info.context, "session", {}).get("session_key"),
+                content_type=content_type,
+                object_id=object_id,
                 tags=[
                     cls._mutation_module,
                     cls._mutation_model,

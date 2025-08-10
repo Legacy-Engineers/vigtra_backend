@@ -6,7 +6,7 @@ from guardian.models import BaseObjectPermission
 
 from modules.core.models.openimis_core_models import UUIDModel
 from simple_history.models import HistoricalRecords
-from datetime import datetime
+from django.utils import timezone
 
 
 class LocationType(models.Model):
@@ -220,7 +220,7 @@ class HealthFacility(UUIDModel):
     created_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
-    validity_from = models.DateTimeField(db_column="ValidityFrom", default=datetime.now)
+    validity_from = models.DateTimeField(db_column="ValidityFrom", default=timezone.now)
     validity_to = models.DateTimeField(db_column="ValidityTo", blank=True, null=True)
 
     history = HistoricalRecords()

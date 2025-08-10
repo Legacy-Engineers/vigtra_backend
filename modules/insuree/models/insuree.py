@@ -72,7 +72,6 @@ class Insuree(
     core_models.VersionedModel,
     core_models.ExtendableModel,
     LifecycleModel,
-    location_models.LocationObjectLevelPermissionBase,
 ):
     """Enhanced Insuree model with better validation and performance."""
 
@@ -163,7 +162,7 @@ class Insuree(
 
     dob = models.DateField(blank=True, null=True, help_text=_("Date of birth"))
 
-    marital = models.CharField(
+    marital_status = models.CharField(
         max_length=1,
         blank=True,
         null=True,
@@ -212,6 +211,12 @@ class Insuree(
         max_length=50, blank=True, null=True, help_text=_("Identification number")
     )
 
+    location = models.ForeignKey(
+        location_models.Location,
+        on_delete=models.CASCADE,
+        help_text=_("Location of the insuree"),
+    )
+
     health_facility = models.ForeignKey(
         location_models.HealthFacility,
         on_delete=models.SET_NULL,
@@ -229,7 +234,7 @@ class Insuree(
         help_text=_("Secondary associated health facility"),
     )
 
-    other_health_facility = models.ManyToManyField(
+    other_health_facilities = models.ManyToManyField(
         location_models.HealthFacility,
         related_name="insurees_other_health_facility",
         blank=True,

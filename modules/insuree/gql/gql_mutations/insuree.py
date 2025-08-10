@@ -1,5 +1,6 @@
 from modules.core.gql.core_gql import CreateMutation
 from modules.insuree.services.insuree import InsureeService
+from modules.core.utils import vigtra_message
 import graphene
 
 INSUREE_SERVICE = InsureeService()
@@ -21,7 +22,8 @@ class InsureeStatus(graphene.Enum):
 
 
 class CreateInsureeInput(graphene.InputObjectType):
-    chf_id = graphene.String(required=True)
+    chf_id = graphene.String()
+    auto_generate_chf_id = graphene.Boolean()
     last_name = graphene.String(required=True)
     other_names = graphene.String(required=True)
     gender_code = graphene.String(required=True)
@@ -35,6 +37,12 @@ class CreateInsureeInput(graphene.InputObjectType):
     passport_number = graphene.String()
     status = graphene.Field(InsureeStatus)
     offline = graphene.Boolean()
+    notes = graphene.String()
+    identification_number = graphene.String()
+    identification_type_code = graphene.String()
+    profession_code = graphene.String()
+    education_code = graphene.String()
+    relation_code = graphene.String()
 
 
 class CreateInsureeMutation(CreateMutation):
@@ -45,14 +53,26 @@ class CreateInsureeMutation(CreateMutation):
     _mutation_name = "CreateInsureeMutation"
     _mutation_module = "insuree"
     _mutation_model = "Insuree"
-    _mutation_action_type = 1
 
     class Arguments:
         input = CreateInsureeInput(required=True)
 
     def perform_mutation(self, root, info, **data):
-        return {
-            "data": {"id": 1, "name": data.get("name")},
-            "message": "Insuree created successfully",
-            "success": True,
-        }
+        auto_generate_chf_id = data.get("auto_generate_chf_id", True)
+        if not auto_generate_chf_id:
+            if not data.get("chf_id"):
+                return vigtra_message(
+                    message="CHF ID is required if auto_generate_chf_id is False",
+                    data=data,
+                )
+
+        # Extract user from context
+        user = info.context.user if hasattr(info.context, "user") else None
+        if not user or not user.is_authenticated:
+            return vigtra_message(
+                message="Authentication required",
+                data=data,
+                error_details=["User must be authenticated"],
+            )
+
+        return INSUREE_SERVICE.create_insuree(data, user=user)

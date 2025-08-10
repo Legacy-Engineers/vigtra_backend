@@ -1,6 +1,6 @@
 from django.db import models
 from modules.core.models.openimis_core_models import UUIDModel
-from modules.insuree.models import Insuree
+from modules.insuree.models import Insuree, Family
 from modules.location.models import HealthFacility
 from modules.medical.models.diagnosis import Diagnosis
 from modules.claim.utils import claim_code_generator
@@ -21,12 +21,26 @@ class ClaimStatus(models.TextChoices):
     REJECTED = "rejected", "Rejected"
 
 
+class ClaimType(models.TextChoices):
+    INDIVIDUAL = "individual", "Individual"
+    GROUP = "group", "Group"
+
+
 class Claim(UUIDModel):
     code = models.CharField(max_length=50, unique=True, default=claim_code_generator)
     insuree = models.ForeignKey(
         Insuree,
         on_delete=models.PROTECT,
         related_name="claims",
+        blank=True,
+        null=True,
+    )
+    family = models.ForeignKey(
+        Family,
+        on_delete=models.PROTECT,
+        related_name="claims",
+        blank=True,
+        null=True,
     )
     health_facility = models.ForeignKey(
         HealthFacility,
@@ -44,7 +58,9 @@ class Claim(UUIDModel):
     visit_type = models.CharField(
         max_length=50, choices=VisitType.choices, default=VisitType.UNKNOWN
     )
-
+    claim_type = models.CharField(
+        max_length=50, choices=ClaimType.choices, default=ClaimType.INDIVIDUAL
+    )
     status = models.CharField(
         max_length=30,
         choices=ClaimStatus.choices,

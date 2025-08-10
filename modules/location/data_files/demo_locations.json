@@ -1,0 +1,181 @@
+{
+    "demo_locations": {
+        "location_types": [
+            {
+                "name": "Country",
+                "level": 1
+            },
+            {
+                "name": "State",
+                "level": 2
+            },
+            {
+                "name": "District",
+                "level": 3
+            },
+            {
+                "name": "City",
+                "level": 4
+            },
+            {
+                "name": "Sub-District",
+                "level": 5
+            },
+            {
+                "name": "Village",
+                "level": 6
+            },
+            {
+                "name": "Community",
+                "level": 7
+            }
+        ],
+        "country": {
+            "name": "The Gambia",
+            "code": "COUNTRY-GMB",
+            "parent_code": null
+        },
+        "states": [
+            {
+                "name": "Western",
+                "code": "STATE-WES",
+                "parent_code": "COUNTRY-GMB"
+            },
+            {
+                "name": "Upper River",
+                "code": "STATE-UPR",
+                "parent_code": "COUNTRY-GMB"
+            },
+            {
+                "name": "Lower River",
+                "code": "STATE-LRN",
+                "parent_code": "COUNTRY-GMB"
+            },
+            {
+                "name": "Central River",
+                "code": "STATE-CRN",
+                "parent_code": "COUNTRY-GMB"
+            },
+            {
+                "name": "North Bank",
+                "code": "STATE-NRB",
+                "parent_code": "COUNTRY-GMB"
+            },
+            {
+                "name": "River Nyan",
+                "code": "STATE-RNY",
+                "parent_code": "COUNTRY-GMB"
+            }
+        ], 
+        "districts": [
+            {
+                "name": "Bakau",
+                "code": "DISTRICT-BKU",
+                "parent_code": "STATE-WES"
+            },
+            {
+                "name": "Banjul",
+                "code": "DISTRICT-BJL",
+                "parent_code": "STATE-WES"
+            },
+            {
+                "name": "Serekunda",
+                "code": "DISTRICT-SER",
+                "parent_code": "STATE-WES"
+            },
+            {
+                "name": "Brikama",
+                "code": "DISTRICT-BRK",
+                "parent_code": "STATE-WES"
+            },
+            {
+                "name": "Kuntaur",
+                "code": "DISTRICT-KUN",
+                "parent_code": "STATE-WES"
+            },
+            {
+                "name": "Kerewan",
+                "code": "DISTRICT-KER",
+                "parent_code": "STATE-WES"
+            }
+        ],
+        "cities": [
+            {
+                "name": "Bakau",
+                "code": "CITY-BKU",
+                "parent_code": "DISTRICT-BKU"
+            },
+            {
+                "name": "Banjul",
+                "code": "CITY-BJL",
+                "parent_code": "DISTRICT-BJL"
+            },
+            {
+                "name": "Serekunda",
+                "code": "CITY-SER",
+                "parent_code": "DISTRICT-SER"
+            },
+            {
+                "name": "Brikama",
+                "code": "CITY-BRK",
+                "parent_code": "DISTRICT-BRK"
+            },
+            {
+                "name": "Kuntaur",
+                "code": "CITY-KUN",
+                "parent_code": "DISTRICT-KUN"
+            },
+            {
+                "name": "Kerewan",
+                "code": "CITY-KER",
+                "parent_code": "DISTRICT-KER"
+            }
+        ],
+        "sub_districts": [
+            {
+                "name": "Bakau",
+                "code": "SUB-DISTRICT-BKU",
+                "parent_code": "DISTRICT-BKU"
+            },
+            {
+                "name": "Banjul",
+                "code": "SUB-DISTRICT-BJL",
+                "parent_code": "DISTRICT-BJL"
+            },
+            {
+                "name": "Serekunda",
+                "code": "SUB-DISTRICT-SER",
+                "parent_code": "DISTRICT-SER"
+            },
+            {
+                "name": "Brikama",
+                "code": "SUB-DISTRICT-BRK",
+                "parent_code": "DISTRICT-BRK"
+            },
+            {
+                "name": "Kuntaur",
+                "code": "SUB-DISTRICT-KUN",
+                "parent_code": "DISTRICT-KUN"
+            },
+            {
+                "name": "Kerewan",
+                "code": "SUB-DISTRICT-KER",
+                "parent_code": "DISTRICT-KER"
+            }
+        ],
+        "villages": [
+            {
+                "name": "Bakau",
+                "code": "VILLAGE-BKU",
+                "parent_code": "SUB-DISTRICT-BKU"
+            }
+        ],
+        "communities": [
+            {
+                "name": "Bakau",
+                "code": "COMMUNITY-BKU",
+                "parent_code": "VILLAGE-BKU"
+            }
+        ]
+    }
+}
