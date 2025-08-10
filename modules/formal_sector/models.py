@@ -70,13 +70,3 @@ class FormalSectorInsuree(models.Model):
 
     class Meta:
         db_table = "tblFormalSectorInsuree"
-
-
-class FormalSectorUser(models.Model):
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    formal_sector = models.ForeignKey(
-        FormalSector, db_column="PolicyHolderId", on_delete=models.deletion.DO_NOTHING
-    )
-
-    class Meta:
-        db_table = "tblFormalSectorUsers"

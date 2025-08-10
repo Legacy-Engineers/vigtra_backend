@@ -40,6 +40,17 @@ DEFAULT_EXTRA_SETTINGS = {
     "auth_signals": [
         "sample_app.signals.SampleSignal",
     ],
+    "extra_cache_settings": [
+        {
+            "name": "sample_cache",
+            "backend": "django.core.cache.backends.locmem.LocMemCache",
+            "options": {
+                "max_connections": 50,
+            },
+            "key_prefix": "sample_cache",
+            "timeout": 60,
+        },
+    ],
 }
 
 
@@ -51,6 +62,32 @@ class ExtraSettings:
                 f"Extra settings file not found: {EXTRA_SETTINGS_CONFIG_FILE}, generating default settings"
             )
             cls.generate_extra_settings()
+
+    @classmethod
+    def get_extra_cache_settings(cls):
+        data = cls.get_extra_settings_data()
+        extra_cache_settings = data.get("extra_cache_settings", [])
+
+        caches = []
+
+        for cache in extra_cache_settings:
+            cache_name = cache.get("name", None)
+            cache_backend = cache.get("backend", None)
+            cache_options = cache.get("options", {})
+            cache_key_prefix = cache.get("key_prefix", None)
+            cache_timeout = cache.get("timeout", None)
+
+            prepared_cache = {
+                f"{cache_name}": {
+                    "BACKEND": cache_backend,
+                    "OPTIONS": cache_options,
+                    "KEY_PREFIX": cache_key_prefix,
+                    "TIMEOUT": cache_timeout,
+                },
+            }
+            caches.append(prepared_cache)
+
+        return caches
 
     @classmethod
     def get_extra_modules(cls):

@@ -1,5 +1,6 @@
 import os
 import logging
+from ..extra_settings import ExtraSettings
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,8 @@ CACHE_BACKENDS = {
     "database": "django.core.cache.backends.db.DatabaseCache",
     "filebased": "django.core.cache.backends.filebased.FileBasedCache",
 }
+
+EXTRA_CACHE_SETTINGS = ExtraSettings.get_extra_cache_settings()
 
 
 def get_cache_config():
@@ -132,7 +135,7 @@ def get_dummy_cache():
 # Multi-tier cache setup for production
 def get_multi_tier_cache():
     """Multi-level cache with local memory + Redis."""
-    return {
+    default_cache = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
             "LOCATION": CACHE_URL,
@@ -161,6 +164,17 @@ def get_multi_tier_cache():
             "TIMEOUT": 3600,  # 1 hour for sessions
         },
     }
+
+    for cache_name, cache_config in EXTRA_CACHE_SETTINGS.items():
+        default_cache[cache_name] = {
+            "BACKEND": cache_config["backend"],
+            "LOCATION": CACHE_URL,
+            "OPTIONS": cache_config["options"],
+            "KEY_PREFIX": cache_config["key_prefix"],
+            "TIMEOUT": cache_config["timeout"],
+        }
+
+    return default_cache
 
 
 # Environment-based cache configuration

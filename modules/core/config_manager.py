@@ -1,6 +1,7 @@
 from django.conf import settings
 import os
 import yaml
+from modules.payment_gateway.apps import DEFAULT_PAYMENT_INTEGRATORS
 
 BASE_DIR = getattr(settings, "BASE_DIR", None)
 
@@ -60,6 +61,14 @@ DEFAULT_VIGTRA_CONFIG_DATA = {
             "auto_generate": True,
             "length": 10,
         },
+    },
+    "authentication": {
+        "activate_insuree_user": True,
+    },
+    "payment_gateway": {
+        "activate_payment_gateway": True,
+        "activated_payment_gateways": DEFAULT_PAYMENT_INTEGRATORS,
+        "external_integrations": [],
     },
 }
 
