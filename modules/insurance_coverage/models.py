@@ -22,7 +22,6 @@ class Coverage(core_models.VersionedModel):
     policy_holder = GenericForeignKey("policy_holder_type", "policy_holder_id")
 
     # Payor (could be same as policy_holder or different: Org, Patient, etc.)
-
     payor_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE, related_name="coverage_payor_type"
     )

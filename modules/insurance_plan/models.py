@@ -1,12 +1,13 @@
 from django.db import models
 from modules.core.models import openimis_core_models as core_models
 from modules.authentication.models import User
-from modules.product.models import Product
 from modules.contribution_plan.models import ContributionPlan
 from django_lifecycle import LifecycleModel
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 import uuid
+from modules.location.models import Location
+from modules.medical.models import Item, Service
 
 
 class InsurancePlanStatus(models.IntegerChoices):
@@ -15,6 +16,13 @@ class InsurancePlanStatus(models.IntegerChoices):
     SUSPENDED = 4
     EXPIRED = 8
     READY = 16
+
+
+class InsurancePlanPeriodType(models.TextChoices):
+    DAY = "D", "Day"
+    WEEK = "W", "Week"
+    MONTH = "M", "Month"
+    YEAR = "Y", "Year"
 
 
 class InsurancePlanStage(models.TextChoices):
@@ -27,9 +35,20 @@ class InsurancePlanStage(models.TextChoices):
     CLOSED = "X", "Closed"
 
 
+class InsurancePlanScopeType(models.TextChoices):
+    LOCATION_BASED = "L", "Location Based"
+    MEMBER_BASED = "M", "Member Based"
+    PRODUCT_BASED = "P", "Product Based"
+    SERVICE_BASED = "S", "Service Based"
+    OTHER = "O", "Other"
+
+
 class InsurancePlan(core_models.VersionedModel, LifecycleModel):
     id = models.AutoField(primary_key=True)
     uuid = models.CharField(max_length=36, default=uuid.uuid4, unique=True)
+    code = models.CharField(max_length=36, blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     stage = models.CharField(
         max_length=1, choices=InsurancePlanStage.choices, blank=True, null=True
@@ -44,13 +63,30 @@ class InsurancePlan(core_models.VersionedModel, LifecycleModel):
     policy_holder_id = models.TextField()
     policy_holder = GenericForeignKey("policy_holder_type", "policy_holder_id")
 
-    product = models.ForeignKey(Product, models.DO_NOTHING)
     officer = models.ForeignKey(
         User,
         models.DO_NOTHING,
         blank=True,
         null=True,
     )
+
+    plan_scope_type = models.CharField(
+        max_length=1, choices=InsurancePlanScopeType.choices, blank=True, null=True
+    )
+
+    threshold = models.DecimalField(
+        max_digits=18, decimal_places=2, blank=True, null=True
+    )
+    max_members = models.IntegerField(blank=True, null=True)
+    recurrence = models.PositiveIntegerField(blank=True, null=True)
+
+    location = models.ForeignKey(
+        Location,
+        models.DO_NOTHING,
+        blank=True,
+        null=True,
+    )
+
     contribution_plan = models.ForeignKey(
         ContributionPlan,
         models.DO_NOTHING,
@@ -58,18 +94,49 @@ class InsurancePlan(core_models.VersionedModel, LifecycleModel):
         null=True,
     )
 
-    creation_date = models.DateField(auto_now=True, blank=True, null=True)
-    updation_date = models.DateField(auto_now_add=True, blank=True, null=True)
-
-    enroll_date = models.DateField()
-    start_date = models.DateField()
-    effective_date = models.DateField(blank=True, null=True)
-    expiry_date = models.DateField(blank=True, null=True)
-    offline = models.BooleanField(blank=True, null=True)
-
     def is_new(self):
         return not self.stage or self.stage == InsurancePlan.STAGE_NEW
 
     class Meta:
         managed = True
         db_table = "tblInsurancePlans"
+
+
+class InsurancePlanItem(core_models.VersionedModel):
+    id = models.AutoField(primary_key=True)
+    uuid = models.CharField(max_length=36, default=uuid.uuid4, unique=True)
+
+    insurance_plan = models.ForeignKey(InsurancePlan, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity = models.IntegerField(blank=True, null=True)
+    unit_price = models.DecimalField(
+        max_digits=18, decimal_places=2, blank=True, null=True
+    )
+    total_price = models.DecimalField(
+        max_digits=18, decimal_places=2, blank=True, null=True
+    )
+
+    # The period of the item
+
+    class Meta:
+        managed = True
+        db_table = "tblInsurancePlanItems"
+
+
+class InsurancePlanService(core_models.VersionedModel):
+    id = models.AutoField(primary_key=True)
+    uuid = models.CharField(max_length=36, default=uuid.uuid4, unique=True)
+
+    insurance_plan = models.ForeignKey(InsurancePlan, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
+    quantity = models.IntegerField(blank=True, null=True)
+    unit_price = models.DecimalField(
+        max_digits=18, decimal_places=2, blank=True, null=True
+    )
+    total_price = models.DecimalField(
+        max_digits=18, decimal_places=2, blank=True, null=True
+    )
+
+    class Meta:
+        managed = True
+        db_table = "tblInsurancePlanServices"

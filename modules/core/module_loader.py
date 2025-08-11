@@ -29,19 +29,19 @@ MODULES = [
     ModuleConfig("Claim", "modules.claim"),
     ModuleConfig("Claim AI", "modules.claim.claim_ai"),
     ModuleConfig("FHIR API", "modules.fhir_api"),
-    ModuleConfig("Contribution", "modules.contribution"),
     ModuleConfig("Contribution Plan", "modules.contribution_plan"),
     ModuleConfig("Formal Sector", "modules.formal_sector"),
-    ModuleConfig("Product", "modules.product"),
     ModuleConfig("Preauthorization", "modules.preauthorization"),
     ModuleConfig("Report", "modules.report"),
     ModuleConfig("Payment", "modules.payment"),
     ModuleConfig("Billing", "modules.payment.billing"),
-    ModuleConfig("Premium", "modules.payment.premium"),
+    ModuleConfig("Premium", "modules.premium"),
+    ModuleConfig("Organization", "modules.organization"),
     ModuleConfig("Contract", "modules.contract"),
     ModuleConfig("Service", "modules.service"),
     ModuleConfig("Medical", "modules.medical"),
     ModuleConfig("Notification Hub", "modules.notification_hub"),
+    ModuleConfig("Policy", "modules.policy"),
 ]
 
 
