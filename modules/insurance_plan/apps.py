@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PolicyConfig(AppConfig):
+class InsurancePlanConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "modules.policy"
+    name = "modules.insurance_plan"

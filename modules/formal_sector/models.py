@@ -2,8 +2,6 @@ from django.db import models
 from modules.location.models import Location
 from modules.insuree.models import Insuree
 from modules.contribution_plan.models import ContributionPlanBundle
-from modules.authentication.models import User
-from modules.policy.models import Policy
 
 # Create your models here.
 

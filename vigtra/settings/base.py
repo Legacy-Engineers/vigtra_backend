@@ -26,13 +26,14 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "graphene_django",
     "django_filters",
-    "passkeys",
+    # "passkeys",  # Temporarily disabled
     "axes",
     "django_lifecycle_checks",
     "simple_history",
     "easyaudit",
     "rest_framework",
     "rest_framework_api_key",
+    "graphql_jwt.refresh_token",
     # For development
     "debug_toolbar",
 ]
@@ -124,7 +125,7 @@ DEFAULT_AUTO_FIELD = os.getenv("DEFAULT_AUTO_FIELD", "django.db.models.BigAutoFi
 
 AUTHENTICATION_BACKENDS = [
     "axes.backends.AxesStandaloneBackend",
-    "passkeys.backend.PasskeyModelBackend",
+    # "passkeys.backend.PasskeyModelBackend",  # Temporarily disabled
     "graphql_jwt.backends.JSONWebTokenBackend",
     "django.contrib.auth.backends.ModelBackend",
     "guardian.backends.ObjectPermissionBackend",

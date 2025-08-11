@@ -10,7 +10,7 @@ settings_module = os.environ.get("DJANGO_SETTINGS_MODULE")
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(r"api/", include("modules.core.urls")),
-    path(r"passkeys/", include("passkeys.urls")),
+    # path(r"passkeys/", include("passkeys.urls")),  # Temporarily disabled
 ]
 
 if settings.DEBUG:

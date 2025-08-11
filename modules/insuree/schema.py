@@ -1,7 +1,6 @@
 from graphene_django.filter import DjangoFilterConnectionField
 from .gql import gql_queries, gql_mutations
 from .models import Insuree
-from django.contrib.auth.models import AnonymousUser
 from modules.authentication.models.user import UserApplicationTypeChoices
 from modules.location.models import Location
 import graphene
@@ -23,9 +22,7 @@ class Query(graphene.ObjectType):
 
     def resolve_insurees(self, info, **kwargs):
         user = info.context.user
-        if not user.is_authenticated or isinstance(user, AnonymousUser):
-            raise Exception("You must be logged in to access this resource")
-
+        print(user)
         query_set = None
         if user.is_superuser:
             query_set = Insuree.objects.all()

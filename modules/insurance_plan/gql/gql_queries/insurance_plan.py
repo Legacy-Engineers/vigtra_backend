@@ -1,11 +1,11 @@
 from graphene_django import DjangoObjectType
-from modules.policy.models import Policy
+from modules.insurance_plan.models import InsurancePlan
 import graphene
 
 
-class PolicyGQLType(DjangoObjectType):
+class InsurancePlanGQLType(DjangoObjectType):
     class Meta:
-        model = Policy
+        model = InsurancePlan
         interfaces = (graphene.relay.Node,)
         filter_fields = {
             "id": ["exact", "in"],

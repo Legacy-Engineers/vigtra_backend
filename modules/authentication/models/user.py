@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager, Permission
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from modules.location.models import Location, HealthFacility
+from django.db.models.functions import Now
 import uuid
 
 
@@ -52,7 +53,9 @@ class User(AbstractUser, PermissionsMixin):
     email = models.EmailField(_("email address"), unique=True)
 
     # Audit fields
-    created_at = models.DateTimeField(_("created at"), default=timezone.now)
+    created_at = models.DateTimeField(
+        _("created at"), default=timezone.now, db_default=Now()
+    )
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
     user_application_type = models.CharField(

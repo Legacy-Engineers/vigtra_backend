@@ -2,8 +2,9 @@ from django.db import models
 from modules.core.models.openimis_core_models import UUIDModel
 from modules.insuree.models import Insuree, Family
 from modules.location.models import HealthFacility
-from modules.medical.models.diagnosis import Diagnosis
+from modules.medical.models import Diagnosis, Item, Service
 from modules.claim.utils import claim_code_generator
+from modules.insurance_coverage.models import Coverage
 
 
 class VisitType(models.TextChoices):
@@ -15,6 +16,8 @@ class VisitType(models.TextChoices):
 
 
 class ClaimStatus(models.TextChoices):
+    DRAFT = "draft", "Draft"
+    PENDING = "pending", "Pending"
     SUBMITTED = "submitted", "Submitted"
     REVIEWED = "reviewed", "Reviewed"
     APPROVED = "approved", "Approved"
@@ -64,12 +67,10 @@ class Claim(UUIDModel):
     status = models.CharField(
         max_length=30,
         choices=ClaimStatus.choices,
-        default=ClaimStatus.SUBMITTED,
+        default=ClaimStatus.DRAFT,
     )
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     explanation = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     diagnosis = models.ForeignKey(
         Diagnosis,
@@ -109,6 +110,27 @@ class Claim(UUIDModel):
         blank=True,
     )
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    coverage = models.ForeignKey(
+        Coverage,
+        on_delete=models.PROTECT,
+        related_name="claims",
+        blank=True,
+        null=True,
+    )
+
+    use = models.CharField(
+        max_length=30,
+        choices=[
+            ("claim", "Claim"),
+            ("preauthorization", "Pre-authorization"),
+            ("predetermination", "Predetermination"),
+        ],
+        default="claim",
+    )
+
     class Meta:
         db_table = "tblClaims"
         verbose_name = "Claim"
@@ -118,8 +140,113 @@ class Claim(UUIDModel):
         return f"Claim {self.code}"
 
 
-class ClaimItem(UUIDModel):
-    pass
+class ClaimDetail(UUIDModel):
+    """
+    Represents a detailed grouping or service category within a claim.
+    """
+
+    claim = models.ForeignKey(
+        Claim,
+        on_delete=models.CASCADE,
+        related_name="details",
+        help_text="The claim this detail belongs to",
+    )
+    service_date = models.DateField(help_text="Date the service was provided")
+    service_code = models.CharField(
+        max_length=50, blank=True, null=True, help_text="Code for the service category"
+    )
+    description = models.TextField(
+        blank=True, null=True, help_text="Description of the service or detail"
+    )
+    total_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        help_text="Total amount for this claim detail",
+    )
+
+    class Meta:
+        db_table = "tblClaimDetails"
+        verbose_name = "Claim Detail"
+        verbose_name_plural = "Claim Details"
+
+    def __str__(self):
+        return f"ClaimDetail {self.id} for Claim {self.claim.code}"
+
+
+class ClaimLineItem(UUIDModel):
+    """
+    Represents individual billed items (procedures, medications, etc.) within a Claim Detail.
+    """
+
+    claim_detail = models.ForeignKey(
+        ClaimDetail,
+        on_delete=models.CASCADE,
+        related_name="line_items",
+        help_text="The claim detail this line item belongs to",
+    )
+    item = models.ForeignKey(Item, on_delete=models.PROTECT, related_name="line_items")
+    description = models.TextField(
+        blank=True, null=True, help_text="Description of the item"
+    )
+    quantity = models.PositiveIntegerField(default=1, help_text="Quantity of the item")
+    unit_price = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0, help_text="Price per unit"
+    )
+    total_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        help_text="Total price (quantity * unit price)",
+    )
+
+    class Meta:
+        db_table = "tblClaimLineItems"
+        verbose_name = "Claim Line Item"
+        verbose_name_plural = "Claim Line Items"
+
+    def __str__(self):
+        return f"LineItem {self.item.code} for ClaimDetail {self.claim_detail.id}"
+
+
+class ClaimServiceItem(UUIDModel):
+    """
+    Optional: A finer categorization or attributes of ClaimLineItem services (e.g., modifiers, sub-procedures).
+    Use this if your domain needs it; otherwise, you may skip it.
+    """
+
+    claim_line_item = models.ForeignKey(
+        ClaimLineItem,
+        on_delete=models.CASCADE,
+        related_name="service_items",
+        help_text="The claim line item this service item belongs to",
+    )
+    service = models.ForeignKey(
+        Service, on_delete=models.PROTECT, related_name="service_items"
+    )
+    description = models.TextField(
+        blank=True, null=True, help_text="Description of the service item"
+    )
+    quantity = models.PositiveIntegerField(
+        default=1, help_text="Quantity of the service item"
+    )
+    unit_price = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0, help_text="Price per unit"
+    )
+    total_price = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        help_text="Total price (quantity * unit price)",
+    )
+
+    class Meta:
+        db_table = "tblClaimServiceItems"
+        verbose_name = "Claim Service Item"
+        verbose_name_plural = "Claim Service Items"
+
+    def __str__(self):
+        return f"ServiceItem {self.service.code} for ClaimLineItem {self.claim_line_item.id}"
 
 
 class ClaimAttachment(UUIDModel):
@@ -127,6 +254,10 @@ class ClaimAttachment(UUIDModel):
         Claim,
         on_delete=models.PROTECT,
         related_name="attachments",
+    )
+    file = models.FileField(upload_to="claims/attachments/")
+    description = models.TextField(
+        blank=True, null=True, help_text="Description of the attachment"
     )
 
     class Meta:

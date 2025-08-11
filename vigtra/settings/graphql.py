@@ -22,7 +22,7 @@ GRAPHIQL_URL = os.getenv("GRAPHIQL_URL", "/graphiql/")
 
 # Base middleware - only include what exists
 GRAPHQL_MIDDLEWARE = [
-    "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    # "graphql_jwt.middleware.JSONWebTokenMiddleware",  # Temporarily disabled - causing signature decode errors
 ]
 
 # Add environment-specific middleware
@@ -93,10 +93,9 @@ CORS_URLS_REGEX = r"^/graphql.*$"
 
 GRAPHQL_JWT = {
     # Auto-generate temporary JWT secret for development
-    "JWT_SECRET_KEY": secrets.token_urlsafe(32),
+    "JWT_SECRET_KEY": "WpcrCVhNW1qBc1Qz3Jif9eyQvglxozjoyi-pUdquAdM",
     # Token expiration settings
     "JWT_EXPIRATION_DELTA": timedelta(minutes=60),
-    "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     "JWT_VERIFY_EXPIRATION": True,
     # Refresh token settings (fully enabled)
     "JWT_ALLOW_REFRESH": True,
@@ -113,10 +112,6 @@ GRAPHQL_JWT = {
     "JWT_COOKIE_SECURE": False,  # False for development (HTTP)
     "JWT_COOKIE_HTTP_ONLY": True,
     "JWT_COOKIE_SAMESITE": "Lax",
-    # Additional settings for refresh tokens
-    "JWT_BLACKLIST_ENABLED": True,
-    "JWT_BLACKLIST_TOKEN_CHECKS": ["refresh"],
-    "JWT_REFRESH_TOKEN_MODEL": "graphql_jwt.RefreshToken",
 }
 
 logger.info(f"GraphQL configured for {ENVIRONMENT} environment")

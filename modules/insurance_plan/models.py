@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 import uuid
 
 
-class PolicyStatus(models.IntegerChoices):
+class InsurancePlanStatus(models.IntegerChoices):
     IDLE = 1
     ACTIVE = 2
     SUSPENDED = 4
@@ -17,7 +17,7 @@ class PolicyStatus(models.IntegerChoices):
     READY = 16
 
 
-class PolicyStage(models.TextChoices):
+class InsurancePlanStage(models.TextChoices):
     NEW = "N", "New"
     RENEWED = "R", "Renewed"
     CANCELLED = "C", "Cancelled"
@@ -27,15 +27,15 @@ class PolicyStage(models.TextChoices):
     CLOSED = "X", "Closed"
 
 
-class Policy(core_models.VersionedModel, LifecycleModel):
+class InsurancePlan(core_models.VersionedModel, LifecycleModel):
     id = models.AutoField(primary_key=True)
     uuid = models.CharField(max_length=36, default=uuid.uuid4, unique=True)
 
     stage = models.CharField(
-        max_length=1, choices=PolicyStage.choices, blank=True, null=True
+        max_length=1, choices=InsurancePlanStage.choices, blank=True, null=True
     )
     status = models.SmallIntegerField(
-        choices=PolicyStatus.choices, blank=True, null=True
+        choices=InsurancePlanStatus.choices, blank=True, null=True
     )
     value = models.DecimalField(max_digits=18, decimal_places=2, blank=True, null=True)
 
@@ -44,11 +44,6 @@ class Policy(core_models.VersionedModel, LifecycleModel):
     policy_holder_id = models.TextField()
     policy_holder = GenericForeignKey("policy_holder_type", "policy_holder_id")
 
-    enroll_date = models.DateField()
-    start_date = models.DateField()
-    effective_date = models.DateField(blank=True, null=True)
-    expiry_date = models.DateField(blank=True, null=True)
-
     product = models.ForeignKey(Product, models.DO_NOTHING)
     officer = models.ForeignKey(
         User,
@@ -56,24 +51,25 @@ class Policy(core_models.VersionedModel, LifecycleModel):
         blank=True,
         null=True,
     )
-
-    offline = models.BooleanField(blank=True, null=True)
-    audit_user_id = models.IntegerField()
     contribution_plan = models.ForeignKey(
         ContributionPlan,
         models.DO_NOTHING,
         blank=True,
         null=True,
     )
+
     creation_date = models.DateField(auto_now=True, blank=True, null=True)
     updation_date = models.DateField(auto_now_add=True, blank=True, null=True)
 
-    def claim_ded_rems(self):
-        return self.claim_ded_rems
+    enroll_date = models.DateField()
+    start_date = models.DateField()
+    effective_date = models.DateField(blank=True, null=True)
+    expiry_date = models.DateField(blank=True, null=True)
+    offline = models.BooleanField(blank=True, null=True)
 
     def is_new(self):
-        return not self.stage or self.stage == Policy.STAGE_NEW
+        return not self.stage or self.stage == InsurancePlan.STAGE_NEW
 
     class Meta:
         managed = True
-        db_table = "tblPolicies"
+        db_table = "tblInsurancePlans"
