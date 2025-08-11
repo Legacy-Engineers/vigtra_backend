@@ -49,6 +49,7 @@ class ContributionPlanStatus(models.TextChoices):
     SUSPENDED = "SU", _("Suspended")
     EXPIRED = "EX", _("Expired")
     CANCELLED = "CA", _("Cancelled")
+    INACTIVE = "IN", _("Inactive")
 
 
 class ContributionPlanManager(models.Manager):
@@ -216,15 +217,6 @@ class ContributionPlan(
         help_text=_("Locations where this plan is available (empty = all locations)"),
     )
 
-    # Plan Lifecycle
-    effective_date = models.DateField(
-        default=datetime.date.today, help_text=_("Date when the plan becomes effective")
-    )
-
-    expiry_date = models.DateField(
-        blank=True, null=True, help_text=_("Date when the plan expires")
-    )
-
     # Financial Configuration
     currency = models.CharField(
         max_length=3,
@@ -280,10 +272,14 @@ class ContributionPlan(
         super().clean()
 
         # Validate date ranges
-        if self.expiry_date and self.effective_date:
-            if self.expiry_date <= self.effective_date:
+        if self.validity_to and self.validity_from:
+            if self.validity_to <= self.validity_from:
                 raise ValidationError(
-                    {"expiry_date": _("Expiry date must be after effective date")}
+                    {
+                        "validity_to": _(
+                            "Validity to date must be after validity from date"
+                        )
+                    }
                 )
 
         # Validate age ranges
@@ -515,17 +511,17 @@ class ContributionPlan(
         today = datetime.date.today()
         return (
             self.status == ContributionPlanStatus.ACTIVE
-            and self.effective_date <= today
-            and (self.expiry_date is None or self.expiry_date >= today)
+            and self.validity_from <= today
+            and (self.validity_to is None or self.validity_to >= today)
         )
 
     @property
     def days_until_expiry(self):
         """Calculate days until plan expires."""
-        if not self.expiry_date:
+        if not self.validity_to:
             return None
 
-        days = (self.expiry_date - datetime.date.today()).days
+        days = (self.validity_to - datetime.date.today()).days
         return max(0, days)
 
     def __str__(self):
@@ -541,8 +537,10 @@ class ContributionPlan(
             models.Index(fields=["code"], name="idx_contrib_plan_code"),
             models.Index(fields=["status"], name="idx_contrib_plan_status"),
             models.Index(fields=["plan_type"], name="idx_contrib_plan_type"),
-            models.Index(fields=["effective_date"], name="idx_contrib_plan_effective"),
-            models.Index(fields=["expiry_date"], name="idx_contrib_plan_expiry"),
+            models.Index(
+                fields=["validity_from"], name="idx_contrib_plan_validity_from"
+            ),
+            models.Index(fields=["validity_to"], name="idx_contrib_plan_validity_to"),
             models.Index(
                 fields=["calculation_type"], name="idx_contrib_plan_calc_type"
             ),
@@ -559,8 +557,8 @@ class ContributionPlan(
                 fields=["code"], name="unique_contribution_plan_code"
             ),
             models.CheckConstraint(
-                check=Q(effective_date__lte=F("expiry_date"))
-                | Q(expiry_date__isnull=True),
+                check=Q(validity_from__lte=F("validity_to"))
+                | Q(validity_to__isnull=True),
                 name="chk_contrib_plan_dates",
             ),
             models.CheckConstraint(

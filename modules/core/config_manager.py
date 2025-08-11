@@ -70,6 +70,13 @@ DEFAULT_VIGTRA_CONFIG_DATA = {
         "activated_payment_gateways": DEFAULT_PAYMENT_INTEGRATORS,
         "external_integrations": [],
     },
+    "contribution_plan": {
+        "code_config": {
+            "prefix": "CP",
+            "auto_generate": True,
+            "length": 10,
+        },
+    },
 }
 
 
@@ -96,6 +103,11 @@ class ConfigManager:
     def get_claim_config(cls):
         config_data = cls.get_config_data()
         return config_data.get("claim", {})
+
+    @classmethod
+    def get_contribution_plan_config(cls):
+        config_data = cls.get_config_data()
+        return config_data.get("contribution_plan", {})
 
     @classmethod
     def get_health_facility_config(cls):
