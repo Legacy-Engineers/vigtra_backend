@@ -9,7 +9,7 @@ VIGTRA_CONFIG_FILE = os.path.join(BASE_DIR, "vigtra_core_config.yaml")
 
 DEFAULT_VIGTRA_CONFIG_DATA = {
     "site_config": {
-        "logo": "https://www.google.com",
+        "logo": "logo.png",
         "name": "Vigtra",
         "description": "Vigtra is a platform for managing claims and health facilities",
         "contact_email": "info@vigtra.com",

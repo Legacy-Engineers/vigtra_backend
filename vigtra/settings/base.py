@@ -59,12 +59,12 @@ MIDDLEWARE = [
 # Third party middleware
 THIRD_PARTY_MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "axes.middleware.AxesMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 MIDDLEWARE += THIRD_PARTY_MIDDLEWARE + ExtraSettings.get_extra_third_party_middleware()
 
+MIDDLEWARE.append("axes.middleware.AxesMiddleware")
 
 ROOT_URLCONF = "vigtra.urls"
 
@@ -118,7 +118,15 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = os.getenv("STATIC_URL", "static/")
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Additional locations of static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 
 DEFAULT_AUTO_FIELD = os.getenv("DEFAULT_AUTO_FIELD", "django.db.models.BigAutoField")
 
@@ -146,8 +154,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+# STATIC_URL and STATIC_ROOT are already defined above
 
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB

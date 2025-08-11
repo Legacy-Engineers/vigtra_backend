@@ -4,4 +4,5 @@ SETTINGS = [
     "database.py",
     "graphql.py",
     "logging.py",
+    "jazzmin.py",
 ]

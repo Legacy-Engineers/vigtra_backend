@@ -3,6 +3,7 @@ from .module_loader import get_module_queries, get_module_mutations
 from .gql import gql_queries
 from graphene_django.filter import DjangoFilterConnectionField
 from vigtra.extra_settings import ExtraSettings
+from modules.core.config_manager import ConfigManager
 
 
 def create_schema():
@@ -35,6 +36,28 @@ def create_schema():
             gql_queries.RequestEventGQLType,
             description="Query request events with filtering",
         )
+        get_site_config = graphene.Field(gql_queries.SiteConfigType)
+
+        def resolve_get_site_config(self, info):
+            print("Resolving site config")
+            site_config = ConfigManager.get_site_config()
+            print(site_config)
+            return gql_queries.SiteConfigType(
+                name=site_config.get("name", "Vigtra"),
+                logo=site_config.get("logo", "logo.png"),
+                description=site_config.get(
+                    "description",
+                    "Vigtra is a platform for managing claims and health facilities",
+                ),
+                contact_email=site_config.get("contact_email", "info@vigtra.com"),
+                contact_phone=site_config.get("contact_phone", "+254712345678"),
+                contact_address=site_config.get(
+                    "contact_address", "123 Main St, Nairobi, Kenya"
+                ),
+                contact_website=site_config.get(
+                    "contact_website", "https://www.vigtra.com"
+                ),
+            )
 
         # Health check
         health = graphene.String(description="API health check")
