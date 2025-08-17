@@ -18,6 +18,9 @@ class UserManager(BaseUserManager):
         username = self.normalize_username(username)
         extra_fields.setdefault("is_active", True)
         user = self.model(username=username, **extra_fields)
+
+        if not password:
+            raise ValueError(_("The password field must be set"))
         user.set_password(password)
         user.save(using=self._db)
         return user
