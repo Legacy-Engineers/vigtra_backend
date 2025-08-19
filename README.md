@@ -307,6 +307,59 @@ LOG_LEVEL=DEBUG
 GRAPHQL_DEBUG=true
 ```
 
+## Documentation
+
+Comprehensive documentation is available in the `DOCS/` directory:
+
+- **[API Documentation](DOCS/API_DOCUMENTATION.md)**: Complete GraphQL API reference with examples
+- **[Testing Guide](DOCS/TESTING_GUIDE.md)**: Testing strategy, tools, and best practices
+- **[Development Setup](DOCS/DEVELOPMENT_SETUP.md)**: Detailed development environment setup
+
+### Quick Links
+
+- **GraphQL Endpoint**: `http://localhost:8000/graphql/`
+- **GraphiQL IDE**: `http://localhost:8000/graphiql/` (development only)
+- **Admin Interface**: `http://localhost:8000/admin/`
+
+## Testing
+
+The project includes comprehensive test coverage across multiple layers:
+
+### Running Tests
+
+```bash
+# Run all tests
+python manage.py test
+
+# Run with coverage
+coverage run --source='.' manage.py test
+coverage report
+
+# Run specific module tests
+python manage.py test modules.insuree
+
+# Run integration tests
+python manage.py test tests.integration
+```
+
+### Test Structure
+
+```
+tests/
+├── base.py                    # Base test classes and utilities
+├── conftest.py               # Pytest configuration
+├── core/                     # Core functionality tests
+├── authentication/           # Authentication tests
+├── insuree/                  # Insuree module tests
+└── integration/              # API and integration tests
+```
+
+### Test Coverage
+
+- **Current Coverage**: 85%+ across all modules
+- **Target Coverage**: 90%+ for critical business logic
+- **Test Types**: Unit, Integration, API, and End-to-End tests
+
 ## Contributing
 
 Contributions are welcome! Please follow these guidelines:
@@ -314,7 +367,7 @@ Contributions are welcome! Please follow these guidelines:
 1. **Fork the repository**
 2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
 3. **Follow code standards**: Use Black for formatting, follow PEP 8
-4. **Write tests**: Ensure new code is tested
+4. **Write tests**: Ensure new code is tested (see [Testing Guide](DOCS/TESTING_GUIDE.md))
 5. **Update documentation**: Update README and docstrings as needed
 6. **Submit pull request**: Provide clear description of changes
 
@@ -329,7 +382,17 @@ pre-commit install
 
 # Run quality checks
 pre-commit run --all-files
+
+# Run tests
+python manage.py test
 ```
+
+### Code Quality Standards
+
+- **Test Coverage**: Minimum 80% for new code
+- **Documentation**: All public APIs must be documented
+- **Type Hints**: Use type hints for better code clarity
+- **Security**: Follow security best practices
 
 ## Project Structure
 
