@@ -45,12 +45,14 @@ INSTALLED_APPS += ExtraSettings.get_extra_templates()
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "vigtra.middleware.performance.PerformanceMonitoringMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "vigtra.middleware.performance.DatabaseQueryCountMiddleware",
     "easyaudit.middleware.easyaudit.EasyAuditMiddleware",
     # For development
     "debug_toolbar.middleware.DebugToolbarMiddleware",
