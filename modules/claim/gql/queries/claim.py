@@ -2,6 +2,7 @@ from graphene_django import DjangoObjectType
 from modules.claim.models import Claim
 from modules.core.utils import prefix_filterset
 from modules.location.gql.gql_queries.health_facility import HealthFacilityGQLType
+from modules.medical.gql.queries.diagnosis import DiagnosisGQLType
 import graphene
 
 
@@ -18,7 +19,7 @@ class ClaimGQLType(DjangoObjectType):
             ),
             "claim_date": ["exact", "gte", "lte"],
             "visit_type": ["exact"],
-            "diagnosis": ["exact", "icontains"],
+            **prefix_filterset("diagnosis__", DiagnosisGQLType._meta.filter_fields),
             "status": ["exact"],
             "total_amount": ["exact", "gte", "lte"],
             "explanation": ["exact", "icontains"],
