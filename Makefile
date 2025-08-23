@@ -1,5 +1,14 @@
 default:
 	./dev_launch.sh
 
-tests:
-	source .venv/bin/activate && python3  manage.py test
+test:
+	uv run manage.py test
+
+makemigrations:
+	uv run manage.py makemigrations
+
+migrate:
+	uv run manage.py migrate
+
+runserver:
+	uv run manage.py runserver
