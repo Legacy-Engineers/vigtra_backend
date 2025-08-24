@@ -1,30 +1,28 @@
 from graphene_django import DjangoObjectType
-from modules.insuree.models.insuree import Insuree
-from modules.insuree.models.family import Family, FamilyMembership
 from modules.core.utils import prefix_filterset
 import graphene
 
 
 class InsureeGQLType(DjangoObjectType):
     class Meta:
-        model = Insuree
+        model = None  # Will be set dynamically
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],
             "chf_id": ["exact", "icontains", "istartswith"],
             "last_name": ["exact", "icontains", "istartswith"],
             "other_names": ["exact", "icontains", "istartswith"],
-            "gender__name": ["exact", "icontains"],
             "dob": ["exact", "gte", "lte"],
             "marital_status": ["exact"],
             "passport": ["exact", "icontains"],
-            "profession__name": ["exact", "icontains"],
-            "education__name": ["exact", "icontains"],
             "status": ["exact"],
+            "offline": ["exact"],
+            "created_date": ["exact", "gte", "lte"],
+            "last_modified": ["exact", "gte", "lte"],
             "location__name": ["exact", "icontains"],
             "location__code": ["exact", "icontains"],
-            "created_date": ["exact", "gte", "lte"],
-            "updated_date": ["exact", "gte", "lte"],
+            "health_facility__name": ["exact", "icontains"],
+            "health_facility__code": ["exact", "icontains"],
         }
         interfaces = (graphene.relay.Node,)
 
@@ -76,18 +74,16 @@ class InsureeGQLType(DjangoObjectType):
 
 class FamilyGQLType(DjangoObjectType):
     class Meta:
-        model = Family
+        model = None  # Will be set dynamically
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],
             "name": ["exact", "icontains", "istartswith"],
-            "family_type__name": ["exact", "icontains"],
-            "location__name": ["exact", "icontains"],
-            "location__code": ["exact", "icontains"],
-            "address": ["exact", "icontains"],
             "is_active": ["exact"],
             "created_date": ["exact", "gte", "lte"],
-            "updated_date": ["exact", "gte", "lte"],
+            "last_modified": ["exact", "gte", "lte"],
+            "location__name": ["exact", "icontains"],
+            "location__code": ["exact", "icontains"],
         }
         interfaces = (graphene.relay.Node,)
 
@@ -110,18 +106,17 @@ class FamilyGQLType(DjangoObjectType):
 
 class FamilyMembershipGQLType(DjangoObjectType):
     class Meta:
-        model = FamilyMembership
+        model = None  # Will be set dynamically
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],
-            "family__name": ["exact", "icontains"],
-            "insuree__chf_id": ["exact", "icontains"],
-            "insuree__last_name": ["exact", "icontains"],
             "is_head": ["exact"],
-            "relationship__name": ["exact", "icontains"],
             "status": ["exact"],
             "membership_start_date": ["exact", "gte", "lte"],
             "membership_end_date": ["exact", "gte", "lte"],
+            "family__name": ["exact", "icontains"],
+            "insuree__chf_id": ["exact", "icontains"],
+            "insuree__last_name": ["exact", "icontains"],
         }
         interfaces = (graphene.relay.Node,)
 
@@ -140,3 +135,21 @@ class FamilyMembershipGQLType(DjangoObjectType):
 
     def resolve_relationship_name(self, info):
         return self.relationship.name if self.relationship else None
+
+
+# Set the models dynamically after Django is ready
+def _set_insuree_models():
+    from modules.insuree.models.insuree import Insuree
+    from modules.insuree.models.family import Family, FamilyMembership
+    InsureeGQLType._meta.model = Insuree
+    FamilyGQLType._meta.model = Family
+    FamilyMembershipGQLType._meta.model = FamilyMembership
+
+
+# This will be called when Django is ready
+try:
+    from django.apps import apps
+    if apps.is_installed('modules.insuree'):
+        _set_insuree_models()
+except:
+    pass
