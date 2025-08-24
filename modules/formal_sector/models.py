@@ -31,7 +31,7 @@ class FormalSector(models.Model):
         blank=True,
         null=True,
     )
-    address = models.JSONField(blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=16, blank=True, null=True)
     fax = models.CharField(max_length=16, blank=True, null=True)
     email = models.CharField(max_length=255, blank=True, null=True)

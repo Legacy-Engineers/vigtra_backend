@@ -1,5 +1,5 @@
 from graphene_django import DjangoObjectType
-from modules.claim.models import Claim
+from modules.claim.models import Claim, ClaimDetail
 from modules.core.utils import prefix_filterset
 from modules.location.gql.gql_queries.health_facility import HealthFacilityGQLType
 from modules.medical.gql.queries.diagnosis import DiagnosisGQLType
@@ -24,4 +24,18 @@ class ClaimGQLType(DjangoObjectType):
             "total_amount": ["exact", "gte", "lte"],
             "explanation": ["exact", "icontains"],
             "created_at": ["exact", "gte", "lte"],
+        }
+
+
+class ClaimDetailGQLType(DjangoObjectType):
+    class Meta:
+        model = ClaimDetail
+        interfaces = (graphene.relay.Node,)
+        filter_fields = {
+            "id": ["exact"],
+            "claim": ["exact"],
+            "service_date": ["exact", "gte", "lte"],
+            "service_code": ["exact", "icontains"],
+            "description": ["exact", "icontains"],
+            "total_amount": ["exact", "gte", "lte"],
         }

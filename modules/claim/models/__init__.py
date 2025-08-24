@@ -1,4 +1,4 @@
-from modules.claim.models.claim import Claim
+from modules.claim.models.claim import Claim, ClaimDetail
 
 
-__all__ = ["Claim"]
+__all__ = ["Claim", "ClaimDetail"]

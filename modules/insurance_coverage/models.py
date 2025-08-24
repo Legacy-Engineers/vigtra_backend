@@ -33,7 +33,7 @@ class Coverage(core_models.VersionedModel):
     end_date = models.DateField(blank=True, null=True)
 
     class Meta:
-        db_table = "tblCoverage"
+        db_table = "tblCoverages"
 
     def __str__(self):
         return f"Coverage for {self.policy_holder} under {self.insurance_plan}"

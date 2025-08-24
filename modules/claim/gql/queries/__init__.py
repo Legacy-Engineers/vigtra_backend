@@ -1,3 +1,3 @@
-from modules.claim.gql.queries.claim import ClaimGQLType
+from modules.claim.gql.queries.claim import ClaimGQLType, ClaimDetailGQLType
 
-__all__ = ["ClaimGQLType"]
+__all__ = ["ClaimGQLType", "ClaimDetailGQLType"]
