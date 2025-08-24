@@ -1,6 +1,7 @@
 from graphene_django.filter import DjangoFilterConnectionField
 from .gql import gql_queries, gql_mutations
 from .models import Insuree
+from .models.family import Family, FamilyMembership
 from modules.authentication.models.user import UserApplicationTypeChoices
 from modules.location.models import Location
 import graphene
@@ -19,6 +20,10 @@ def get_location_based_insurees(user_location: Location) -> QuerySet["Insuree"]:
 
 class Query(graphene.ObjectType):
     insurees = DjangoFilterConnectionField(gql_queries.InsureeGQLType)
+    families = DjangoFilterConnectionField(gql_queries.FamilyGQLType)
+    family_memberships = DjangoFilterConnectionField(
+        gql_queries.FamilyMembershipGQLType
+    )
 
     def resolve_insurees(self, info, **kwargs):
         user = info.context.user
@@ -36,6 +41,18 @@ class Query(graphene.ObjectType):
                 else:
                     raise Exception("User does not have a location")
         return query_set
+
+    def resolve_families(self, info, **kwargs):
+        user = info.context.user
+        if user.is_superuser or user.has_perm("can_view_family"):
+            return Family.objects.all()
+        return Family.objects.none()
+
+    def resolve_family_memberships(self, info, **kwargs):
+        user = info.context.user
+        if user.is_superuser or user.has_perm("can_view_family_membership"):
+            return FamilyMembership.objects.all()
+        return FamilyMembership.objects.none()
 
 
 class Mutation(graphene.ObjectType):

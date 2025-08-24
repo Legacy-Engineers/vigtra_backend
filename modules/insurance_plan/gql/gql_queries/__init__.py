@@ -1,3 +1,11 @@
-from modules.insurance_plan.gql.gql_queries.policy import InsurancePlanGQLType
+from .insurance_plan import (
+    InsurancePlanGQLType,
+    InsurancePlanItemGQLType,
+    InsurancePlanServiceGQLType,
+)
 
-__all__ = ["InsurancePlanGQLType"]
+__all__ = [
+    "InsurancePlanGQLType",
+    "InsurancePlanItemGQLType",
+    "InsurancePlanServiceGQLType",
+]

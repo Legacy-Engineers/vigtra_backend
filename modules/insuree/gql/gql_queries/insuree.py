@@ -1,12 +1,142 @@
 from graphene_django import DjangoObjectType
+from modules.insuree.models.insuree import Insuree
+from modules.insuree.models.family import Family, FamilyMembership
+from modules.core.utils import prefix_filterset
 import graphene
-from ...models import Insuree
 
 
 class InsureeGQLType(DjangoObjectType):
     class Meta:
         model = Insuree
-        interfaces = (graphene.relay.Node,)
         filter_fields = {
-            "chf_id": ["exact", "icontains"],
+            "id": ["exact"],
+            "uuid": ["exact"],
+            "chf_id": ["exact", "icontains", "istartswith"],
+            "last_name": ["exact", "icontains", "istartswith"],
+            "other_names": ["exact", "icontains", "istartswith"],
+            "gender__name": ["exact", "icontains"],
+            "dob": ["exact", "gte", "lte"],
+            "marital_status": ["exact"],
+            "passport": ["exact", "icontains"],
+            "profession__name": ["exact", "icontains"],
+            "education__name": ["exact", "icontains"],
+            "status": ["exact"],
+            "location__name": ["exact", "icontains"],
+            "location__code": ["exact", "icontains"],
+            "created_date": ["exact", "gte", "lte"],
+            "updated_date": ["exact", "gte", "lte"],
         }
+        interfaces = (graphene.relay.Node,)
+
+    # Custom fields
+    age = graphene.Int(description="Calculated age based on date of birth")
+    full_name = graphene.String(description="Full name (last_name + other_names)")
+    is_adult = graphene.Boolean(description="Whether the insuree is an adult")
+    current_family_name = graphene.String(description="Name of current family")
+    is_head_of_family = graphene.Boolean(
+        description="Whether the insuree is head of family"
+    )
+
+    def resolve_age(self, info):
+        if self.dob:
+            from datetime import date
+
+            today = date.today()
+            return (
+                today.year
+                - self.dob.year
+                - ((today.month, today.day) < (self.dob.month, self.dob.day))
+            )
+        return None
+
+    def resolve_full_name(self, info):
+        return f"{self.last_name} {self.other_names}".strip()
+
+    def resolve_is_adult(self, info):
+        if self.dob:
+            from datetime import date
+            from modules.insuree.models.insuree_dependency import AGE_OF_MAJORITY
+
+            today = date.today()
+            age = (
+                today.year
+                - self.dob.year
+                - ((today.month, today.day) < (self.dob.month, self.dob.day))
+            )
+            return age >= AGE_OF_MAJORITY
+        return None
+
+    def resolve_current_family_name(self, info):
+        current_family = getattr(self, "current_family", None)
+        return current_family.name if current_family else None
+
+    def resolve_is_head_of_family(self, info):
+        return getattr(self, "is_head_of_family", False)
+
+
+class FamilyGQLType(DjangoObjectType):
+    class Meta:
+        model = Family
+        filter_fields = {
+            "id": ["exact"],
+            "uuid": ["exact"],
+            "name": ["exact", "icontains", "istartswith"],
+            "family_type__name": ["exact", "icontains"],
+            "location__name": ["exact", "icontains"],
+            "location__code": ["exact", "icontains"],
+            "address": ["exact", "icontains"],
+            "is_active": ["exact"],
+            "created_date": ["exact", "gte", "lte"],
+            "updated_date": ["exact", "gte", "lte"],
+        }
+        interfaces = (graphene.relay.Node,)
+
+    # Custom fields
+    member_count = graphene.Int(description="Number of active family members")
+    head_member = graphene.Field(InsureeGQLType, description="Head of family member")
+    active_members = graphene.List(
+        InsureeGQLType, description="List of active family members"
+    )
+
+    def resolve_member_count(self, info):
+        return getattr(self, "member_count", 0)
+
+    def resolve_head_member(self, info):
+        return getattr(self, "head_member", None)
+
+    def resolve_active_members(self, info):
+        return getattr(self, "active_members", [])
+
+
+class FamilyMembershipGQLType(DjangoObjectType):
+    class Meta:
+        model = FamilyMembership
+        filter_fields = {
+            "id": ["exact"],
+            "uuid": ["exact"],
+            "family__name": ["exact", "icontains"],
+            "insuree__chf_id": ["exact", "icontains"],
+            "insuree__last_name": ["exact", "icontains"],
+            "is_head": ["exact"],
+            "relationship__name": ["exact", "icontains"],
+            "status": ["exact"],
+            "membership_start_date": ["exact", "gte", "lte"],
+            "membership_end_date": ["exact", "gte", "lte"],
+        }
+        interfaces = (graphene.relay.Node,)
+
+    # Custom fields
+    insuree_full_name = graphene.String(description="Full name of the insuree")
+    family_name = graphene.String(description="Name of the family")
+    relationship_name = graphene.String(description="Name of the relationship")
+
+    def resolve_insuree_full_name(self, info):
+        if self.insuree:
+            return f"{self.insuree.last_name} {self.insuree.other_names}".strip()
+        return None
+
+    def resolve_family_name(self, info):
+        return self.family.name if self.family else None
+
+    def resolve_relationship_name(self, info):
+        return self.relationship.name if self.relationship else None

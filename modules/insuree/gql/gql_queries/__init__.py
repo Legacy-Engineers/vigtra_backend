@@ -1,4 +1,7 @@
-from modules.insuree.gql.gql_queries.insuree import InsureeGQLType
+from .insuree import InsureeGQLType, FamilyGQLType, FamilyMembershipGQLType
 
-
-__all__ = ["InsureeGQLType"]
+__all__ = [
+    "InsureeGQLType",
+    "FamilyGQLType",
+    "FamilyMembershipGQLType",
+]
