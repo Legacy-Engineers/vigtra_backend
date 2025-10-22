@@ -148,4 +148,4 @@ print_info "Press Ctrl+C to stop the server"
 echo
 
 # Start the development server
-python manage.py runserver $HOST:$PORT || error_exit "Failed to start development server"
+uv run manage.py runserver $HOST:$PORT || error_exit "Failed to start development server"

@@ -1,5 +1,5 @@
 default:
-	./dev_launch.sh
+	make runserver
 
 test:
 	uv run manage.py test
@@ -11,4 +11,7 @@ migrate:
 	uv run manage.py migrate
 
 runserver:
-	uv run manage.py runserver
+	./dev_launch.sh
+
+install:
+	uv sync
