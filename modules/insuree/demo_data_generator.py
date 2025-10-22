@@ -1,7 +1,7 @@
 from modules.core.base_demo_generator import BaseDemoDataGenerator
 from faker import Faker
 from modules.location.models import Location, LocationType
-from modules.insuree.models.insuree_dependency import Gender
+from modules.insuree.models.insuree_model_dependency import Gender
 from modules.insuree.services.insuree import InsureeService
 import logging
 from django.db import transaction

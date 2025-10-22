@@ -1,6 +1,6 @@
 from .insuree import Insuree, InsureeManager, InsureeStatus
 from .family import Family, FamilyMembership, FamilyMembershipStatus, FamilyType
-from .insuree_dependency import (
+from .insuree_model_dependency import (
     Gender,
     Profession,
     Education,

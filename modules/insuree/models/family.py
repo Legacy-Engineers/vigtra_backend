@@ -11,8 +11,8 @@ from django.conf import settings
 from modules.location import models as location_models
 from django.db.models import Q, F
 from django_lifecycle import LifecycleModel, hook, BEFORE_SAVE
-from modules.insuree.models.insuree_dependency import Relation
-from modules.insuree.models.insuree_dependency import AGE_OF_MAJORITY
+from modules.insuree.models.insuree_model_dependency import Relation
+from modules.insuree.models.insuree_model_dependency import AGE_OF_MAJORITY
 
 
 class FamilyMembershipStatus(models.TextChoices):

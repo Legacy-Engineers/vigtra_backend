@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.test.testcases import logger
 from modules.authentication.models import User
 from modules.insuree.services.insuree import InsureeService
-from modules.insuree.models.insuree_dependency import Gender
+from modules.insuree.models.insuree_model_dependency import Gender
 from modules.location.models import Location, LocationType
 from faker import Faker
 

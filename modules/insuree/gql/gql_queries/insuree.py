@@ -53,7 +53,7 @@ class InsureeGQLType(DjangoObjectType):
     def resolve_is_adult(self, info):
         if self.dob:
             from datetime import date
-            from modules.insuree.models.insuree_dependency import AGE_OF_MAJORITY
+            from modules.insuree.models.insuree_model_dependency import AGE_OF_MAJORITY
 
             today = date.today()
             age = (
@@ -141,6 +141,7 @@ class FamilyMembershipGQLType(DjangoObjectType):
 def _set_insuree_models():
     from modules.insuree.models.insuree import Insuree
     from modules.insuree.models.family import Family, FamilyMembership
+
     InsureeGQLType._meta.model = Insuree
     FamilyGQLType._meta.model = Family
     FamilyMembershipGQLType._meta.model = FamilyMembership
@@ -149,7 +150,8 @@ def _set_insuree_models():
 # This will be called when Django is ready
 try:
     from django.apps import apps
-    if apps.is_installed('modules.insuree'):
+
+    if apps.is_installed("modules.insuree"):
         _set_insuree_models()
 except:
     pass

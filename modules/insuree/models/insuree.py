@@ -5,7 +5,7 @@ from django_lifecycle import LifecycleModel, hook, BEFORE_SAVE
 import uuid
 from datetime import datetime, date
 from modules.core.models import openimis_core_models as core_models
-from modules.insuree.models.insuree_dependency import (
+from modules.insuree.models.insuree_model_dependency import (
     Gender,
     Profession,
     Education,
@@ -14,7 +14,7 @@ from modules.insuree.models.insuree_dependency import (
 
 # Removed circular import - will use string references and lazy imports
 from modules.location import models as location_models
-from .insuree_dependency import AGE_OF_MAJORITY
+from .insuree_model_dependency import AGE_OF_MAJORITY
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from phonenumber_field.modelfields import PhoneNumberField
