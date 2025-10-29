@@ -40,8 +40,15 @@ MODULES = [
     ModuleConfig("Contract", "modules.contract"),
     ModuleConfig("Service", "modules.service"),
     ModuleConfig("Medical", "modules.medical"),
+    ModuleConfig(
+        "Quality Assurance & Accreditation",
+        "modules.quality_assurance_and_accreditation",
+    ),
     ModuleConfig("Notification Hub", "modules.notification_hub"),
     ModuleConfig("Policy", "modules.policy"),
+    ModuleConfig("Calculation Rule", "module.calculation_rule"),
+    ModuleConfig("Payment Gateway", "module.payment_gateway"),
+    ModuleConfig("Ticket", "module.ticket"),
 ]
 
 
