@@ -39,7 +39,7 @@ The project follows a modular architecture with the following key components:
 
 ## Requirements
 
-- Python 3.8 or higher
+- Python 3.10 or higher
 - PostgreSQL 12+ (for production)
 - Redis 6+ (for caching and task queue)
 - Virtual environment tool (venv, virtualenv, or uv)
@@ -51,7 +51,7 @@ The project follows a modular architecture with the following key components:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/Vigtra.git --branch backend vigtra_backend
+   git clone git@github.com:Legacy-Engineers/vigtra_backend.git
    cd vigtra_backend
    ```
 
@@ -62,7 +62,7 @@ The project follows a modular architecture with the following key components:
    uv sync
 
    # Or using traditional pip
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install poetry
    poetry install
@@ -91,6 +91,9 @@ The project follows a modular architecture with the following key components:
    ```bash
    python manage.py runserver
    ```
+
+Or use the Makefile:
+- `make # to run server`
 
 ### Environment Configuration
 
@@ -166,10 +169,6 @@ python manage.py test
 # Run specific app tests
 python manage.py test modules.insuree
 
-# Run with coverage
-coverage run --source='.' manage.py test
-coverage report
-```
 
 ### Code Quality
 
@@ -199,21 +198,6 @@ python manage.py flush
 # Create cache table (if using database cache)
 python manage.py createcachetable
 ```
-
-## Deployment
-
-### Production Checklist
-
-- [ ] Set `ENVIRONMENT=production`
-- [ ] Set `DEBUG=false`
-- [ ] Configure secure `SECRET_KEY` and `JWT_SECRET_KEY`
-- [ ] Set up PostgreSQL database
-- [ ] Configure Redis for caching
-- [ ] Set up proper logging
-- [ ] Configure email settings
-- [ ] Set up SSL certificates
-- [ ] Configure static file serving
-- [ ] Set up monitoring and error tracking
 
 ### Environment Variables for Production
 
@@ -342,91 +326,9 @@ python manage.py test modules.insuree
 python manage.py test tests.integration
 ```
 
-### Test Structure
-
-```
-tests/
-├── base.py                    # Base test classes and utilities
-├── conftest.py               # Pytest configuration
-├── core/                     # Core functionality tests
-├── authentication/           # Authentication tests
-├── insuree/                  # Insuree module tests
-└── integration/              # API and integration tests
-```
-
-### Test Coverage
-
-- **Current Coverage**: 85%+ across all modules
-- **Target Coverage**: 90%+ for critical business logic
-- **Test Types**: Unit, Integration, API, and End-to-End tests
-
-## Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
-3. **Follow code standards**: Use Black for formatting, follow PEP 8
-4. **Write tests**: Ensure new code is tested (see [Testing Guide](DOCS/TESTING_GUIDE.md))
-5. **Update documentation**: Update README and docstrings as needed
-6. **Submit pull request**: Provide clear description of changes
-
-### Development Setup
-
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Set up pre-commit hooks
-pre-commit install
-
-# Run quality checks
-pre-commit run --all-files
-
-# Run tests
-python manage.py test
-```
-
-### Code Quality Standards
-
-- **Test Coverage**: Minimum 80% for new code
-- **Documentation**: All public APIs must be documented
-- **Type Hints**: Use type hints for better code clarity
-- **Security**: Follow security best practices
-
-## Project Structure
-
-```
-vigtra_backend/
-├── vigtra/                 # Main project directory
-│   ├── settings/          # Environment-specific settings
-│   │   ├── base.py
-│   │   ├── development.py
-│   │   ├── production.py
-│   │   ├── database.py
-│   │   ├── cache.py
-│   │   ├── logging.py
-│   │   └── graphql.py
-│   ├── urls.py
-│   └── wsgi.py
-├── modules/               # Application modules
-│   ├── core/             # Core functionality
-│   ├── insuree/          # Insuree management
-│   ├── policy/           # Policy management
-│   ├── claim/            # Claims processing
-│   └── authentication/   # User authentication
-├── logs/                 # Log files
-├── static/               # Static files
-├── media/                # Media uploads
-├── manage.py
-├── requirements.txt
-├── .env.example
-└── README.md
-```
-
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GPL-3.0 License](LICENSE).
 
 ## Acknowledgments
 
