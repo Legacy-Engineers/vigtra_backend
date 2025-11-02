@@ -1,11 +1,12 @@
 from graphene_django import DjangoObjectType
+from modules.insuree.models import Insuree, Family, FamilyMembership
 from modules.core.utils import prefix_filterset
 import graphene
 
 
 class InsureeGQLType(DjangoObjectType):
     class Meta:
-        model = None  # Will be set dynamically
+        model = Insuree
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],
@@ -74,12 +75,10 @@ class InsureeGQLType(DjangoObjectType):
 
 class FamilyGQLType(DjangoObjectType):
     class Meta:
-        model = None  # Will be set dynamically
+        model = Family  # Will be set dynamically
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],
-            "name": ["exact", "icontains", "istartswith"],
-            "is_active": ["exact"],
             "created_date": ["exact", "gte", "lte"],
             "last_modified": ["exact", "gte", "lte"],
             "location__name": ["exact", "icontains"],
@@ -106,7 +105,7 @@ class FamilyGQLType(DjangoObjectType):
 
 class FamilyMembershipGQLType(DjangoObjectType):
     class Meta:
-        model = None  # Will be set dynamically
+        model = FamilyMembership
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],
@@ -114,7 +113,6 @@ class FamilyMembershipGQLType(DjangoObjectType):
             "status": ["exact"],
             "membership_start_date": ["exact", "gte", "lte"],
             "membership_end_date": ["exact", "gte", "lte"],
-            "family__name": ["exact", "icontains"],
             "insuree__chf_id": ["exact", "icontains"],
             "insuree__last_name": ["exact", "icontains"],
         }

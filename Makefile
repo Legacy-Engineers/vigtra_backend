@@ -1,5 +1,4 @@
-default:
-	make runserver
+default: runserver
 
 test:
 	uv run manage.py test
