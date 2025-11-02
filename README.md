@@ -10,7 +10,7 @@ Vigtra aims to provide a robust, scalable, and user-friendly backend for managin
 
 - **Policy Management**: Create, update, and manage health insurance policies.
 - **Claims Processing**: Efficient handling of claims with automated workflows.
-- **Beneficiary Management**: Maintain detailed records of beneficiaries and their coverage.
+- **Insuree Management**: Maintain detailed records of insurees and their coverage.
 - **Family Management**: Advanced family membership tracking with relationship management.
 - **Reporting and Analytics**: Generate insightful reports to aid decision-making.
 - **GraphQL API**: Modern GraphQL API with comprehensive mutation and query support.
@@ -26,16 +26,6 @@ Vigtra aims to provide a robust, scalable, and user-friendly backend for managin
 - **Caching**: Redis (production) / In-memory (development)
 - **Task Queue**: Celery with Redis broker
 - **Logging**: Structured logging with rotation and environment-aware configuration
-
-## Architecture
-
-The project follows a modular architecture with the following key components:
-
-- **Modular Design**: Dynamic module loading system for extensibility
-- **Service Layer**: Business logic encapsulated in service classes
-- **GraphQL Layer**: Comprehensive GraphQL schema with mutations and queries
-- **Audit System**: Complete change tracking and logging
-- **Multi-Environment**: Environment-specific configurations for development, testing, and production
 
 ## Requirements
 
@@ -139,24 +129,6 @@ CACHE_URL=memcached://localhost:11211
 # Development (no caching)
 CACHE_BACKEND=dummy
 ```
-
-### GraphQL Configuration
-
-Access the GraphQL endpoints:
-
-- **GraphQL Endpoint**: `http://localhost:8000/graphql/`
-- **GraphiQL IDE**: `http://localhost:8000/graphiql/` (development only)
-- **Schema**: `http://localhost:8000/graphql/schema/`
-
-## API Documentation
-
-### GraphQL Schema
-
-The API provides comprehensive GraphQL schema with:
-
-- **Queries**: Retrieve data with powerful filtering and pagination
-- **Mutations**: Create, update, and delete operations with validation
-- **Subscriptions**: Real-time updates (if configured)
 
 ## Development
 
