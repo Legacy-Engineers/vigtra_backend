@@ -5,4 +5,5 @@ SETTINGS = [
     "graphql.py",
     "logging.py",
     "jazzmin.py",
+    "grpc_settings.py",
 ]

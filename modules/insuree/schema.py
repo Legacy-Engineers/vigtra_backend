@@ -24,6 +24,13 @@ class Query(graphene.ObjectType):
     family_memberships = DjangoFilterConnectionField(
         gql_queries.FamilyMembershipGQLType
     )
+    insuree = graphene.Field(gql_queries.InsureeGQLType, uuid=graphene.String())
+
+    def resolve_insuree(self, info, uuid=None):
+        try:
+            return Insuree.objects.get(uuid=uuid)
+        except Insuree.DoesNotExist:
+            return None
 
     def resolve_insurees(self, info, **kwargs):
         user = info.context.user

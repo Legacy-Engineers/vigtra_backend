@@ -55,3 +55,4 @@ class BaseCodeModel(models.Model):
 
     def __str__(self):
         return f"{self.code} - {getattr(self, 'name', getattr(self, 'description', self.code))}"
+

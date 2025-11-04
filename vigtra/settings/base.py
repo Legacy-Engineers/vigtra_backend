@@ -34,6 +34,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_api_key",
     "graphql_jwt.refresh_token",
+    "django_socio_grpc",
     # For development
     "debug_toolbar",
 ]

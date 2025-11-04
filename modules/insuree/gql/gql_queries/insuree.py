@@ -1,12 +1,41 @@
 from graphene_django import DjangoObjectType
-from modules.insuree.models import Insuree, Family, FamilyMembership
+from modules.insuree.models import Insuree, IdentificationType, Family, FamilyMembership, InsureeStatus, InsureeIdentification
 from modules.core.utils import prefix_filterset
+from modules.formal_sector.gql.gql_queries import FormalSectorInsureeGQLType
+from modules.formal_sector.models import FormalSectorInsuree
 import graphene
+
+
+class IdentificationTypeGQLType(DjangoObjectType):
+    class Meta:
+        model = IdentificationType
+        fields = "__all__"
+        filter_fields = {
+            "id": ["exact"],
+            "uuid": ["exact"],
+        }
+        interfaces = (graphene.relay.Node,)
+
+class InsureeIdentificationGQLType(DjangoObjectType):
+    class Meta:
+        model = InsureeIdentification
+        fields = "__all__"
+        filter_fields = {
+            "id": ["exact"],
+            "uuid": ["exact"],
+        }
+        interfaces = (graphene.relay.Node,)
+
+    identification_type = graphene.Field(IdentificationTypeGQLType, description="Identification type")
+
+    def resolve_identification_type(self, info):
+        return self.identification_type
 
 
 class InsureeGQLType(DjangoObjectType):
     class Meta:
         model = Insuree
+        fields = "__all__"
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],
@@ -35,6 +64,23 @@ class InsureeGQLType(DjangoObjectType):
     is_head_of_family = graphene.Boolean(
         description="Whether the insuree is head of family"
     )
+    identifications = graphene.List(InsureeIdentificationGQLType, description="List of identifications")
+    formal_sector_info = graphene.List(FormalSectorInsureeGQLType, description="List of formal sector information")
+
+    def resolve_formal_sector_info(self, info):
+        return FormalSectorInsuree.objects.filter(insuree=self)
+
+    def resolve_identifications(self, info):
+        return InsureeIdentification.objects.filter(insuree=self)
+
+    gender_name = graphene.String(description="Name of the gender")
+    profession_name = graphene.String(description="Name of the profession")
+        
+    def resolve_profession_name(self, info):
+        return self.profession.profession if self.profession else None
+
+    def resolve_gender_name(self, info):
+        return self.gender.gender if self.gender else None
 
     def resolve_age(self, info):
         if self.dob:
@@ -70,12 +116,12 @@ class InsureeGQLType(DjangoObjectType):
         return current_family.name if current_family else None
 
     def resolve_is_head_of_family(self, info):
-        return getattr(self, "is_head_of_family", False)
+        return self.is_head_of_family()
 
 
 class FamilyGQLType(DjangoObjectType):
     class Meta:
-        model = Family  # Will be set dynamically
+        model = Family
         filter_fields = {
             "id": ["exact"],
             "uuid": ["exact"],

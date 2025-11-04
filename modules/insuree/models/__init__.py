@@ -1,4 +1,4 @@
-from .insuree import Insuree, InsureeManager, InsureeStatus
+from .insuree import Insuree, InsureeManager, InsureeStatus, InsureeIdentification
 from .family import Family, FamilyMembership, FamilyMembershipStatus, FamilyType
 from .insuree_model_dependency import (
     Gender,
@@ -21,4 +21,5 @@ __all__ = [
     "Education",
     "IdentificationType",
     "Relation",
+    "InsureeIdentification",
 ]

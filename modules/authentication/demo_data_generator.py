@@ -27,5 +27,6 @@ class AuthenticationDemoDataGenerator(BaseDemoDataGenerator):
             User.objects.create(
                 username=user_data["username"],
                 email=user_data["email"],
+                password=user_data["password"],
             )
             logger.info(f"User generated: {user_data['username']}")

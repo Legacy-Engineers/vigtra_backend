@@ -2,28 +2,27 @@ from django.db import models
 from modules.location.models import Location
 from modules.insuree.models import Insuree
 from modules.contribution_plan.models import ContributionPlanBundle
+import uuid
 
 # Create your models here.
 
-SECTOR_TYPE_CHOICES = [
-    (1, "Private"),
-    (2, "Public"),
-    (3, "NGO"),
-    (4, "Other"),
-    (5, "International"),
-    (6, "Cooperative"),
-    (7, "Association"),
-    (8, "Self Employed"),
-    (9, "Informal"),
-    (10, "Formal"),
-    (11, "Other"),
-]
+class SectorTypeChoices(models.TextChoices):
+    PRIVATE_SECTOR = "PRS", "Private Sector"
+    PUBLIC_SECTOR = "PUS", "Public Sector"
+    NGO_SECTOR = "NS", "NGO Sector"
+    INTERNATION_SECTOR = "IS", "International Sector"
+    COORPERATIVE_SECTOR =  "CS", "Cooperative Sector"
+    ASSOICIATION_SECTOR = "AS", "Association Sector"
+    SELF_EMPLOYED_SECTOR = "SE", "Self Employed Sector"
+    INFORMAL_SECTOR = "INS", "Informal Sector"
+    FORMAL_SECTOR = "FS", "Formal Sector"
+    OTHER_SECTOR = "OS", "Other Sectors"
 
 
 class FormalSector(models.Model):
     code = models.CharField(max_length=32)
     trade_name = models.CharField(max_length=255)
-    sector_type = models.CharField(max_length=10)
+    sector_type = models.CharField(max_length=10, choices=SectorTypeChoices.choices, default=SectorTypeChoices.PRIVATE_SECTOR)
     sector_type_other = models.CharField(max_length=20, blank=True, null=True)
     location = models.ForeignKey(
         Location,
@@ -47,6 +46,14 @@ class FormalSector(models.Model):
 
 
 class FormalSectorInsuree(models.Model):
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        null=True,
+        blank=True,
+        help_text="Unique identifier for the formal sector insuree",
+    )
     formal_sector = models.ForeignKey(FormalSector, on_delete=models.DO_NOTHING)
     insuree = models.ForeignKey(Insuree, on_delete=models.DO_NOTHING)
     contribution_plan_bundle = models.ForeignKey(

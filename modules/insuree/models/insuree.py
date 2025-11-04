@@ -11,8 +11,8 @@ from modules.insuree.models.insuree_model_dependency import (
     Education,
     IdentificationType,
 )
+from .family import FamilyMembership
 
-# Removed circular import - will use string references and lazy imports
 from modules.location import models as location_models
 from .insuree_model_dependency import AGE_OF_MAJORITY
 from django.conf import settings
@@ -197,18 +197,6 @@ class Insuree(
         blank=True,
         null=True,
         help_text=_("Education level"),
-    )
-
-    identification = models.ForeignKey(
-        IdentificationType,
-        on_delete=models.PROTECT,
-        blank=True,
-        null=True,
-        help_text=_("Identification type"),
-    )
-
-    identification_number = models.CharField(
-        max_length=50, blank=True, null=True, help_text=_("Identification number")
     )
 
     location = models.ForeignKey(
@@ -629,7 +617,13 @@ class Insuree(
 
     def is_head_of_family(self):  # noqa: F811
         """Check if insuree is head of family."""
-        return self.family and self.family.head_insuree == self
+        fam_membership = FamilyMembership.objects.filter(insuree=self)
+
+        if fam_membership:
+            if fam_membership.is_head:
+                return True
+
+        return False
 
     def age(self, reference_date=None):  # noqa: F811
         """Calculate age with better precision."""
@@ -691,3 +685,24 @@ class Insuree(
             # Note: Date of birth validation is handled in the clean() method
             # to avoid issues with datetime.date.today() at class definition time
         ]
+
+
+class InsureeIdentification(models.Model):
+    """Model for insuree identification."""
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        null=True,
+        blank=True,
+        help_text=_("Unique identifier for the insuree identification"),
+    )
+    insuree = models.ForeignKey(Insuree, on_delete=models.CASCADE, help_text=_("Insuree"))
+    identification_type = models.ForeignKey(IdentificationType, on_delete=models.CASCADE, help_text=_("Identification type"))
+    identification_number = models.CharField(max_length=50, help_text=_("Identification number"))
+
+    class Meta:
+        managed = True
+        db_table = "tblInsureeIdentifications"
+        verbose_name = _("Insuree Identification")
+        verbose_name_plural = _("Insuree Identifications")

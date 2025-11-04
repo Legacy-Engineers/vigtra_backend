@@ -36,6 +36,7 @@ MODULES = [
     ModuleConfig("Payment", "modules.payment"),
     ModuleConfig("Billing", "modules.payment.billing"),
     ModuleConfig("Premium", "modules.premium"),
+    ModuleConfig("GRPC API", "modules.grpc_api"),
     ModuleConfig("Organization", "modules.organization"),
     ModuleConfig("Contract", "modules.contract"),
     ModuleConfig("Service", "modules.service"),

@@ -4,6 +4,9 @@ import graphene
 
 
 class FormalSectorGQLType(DjangoObjectType):
+
+    sector_type = graphene.String()
+    
     class Meta:
         model = FormalSector
         interfaces = (graphene.relay.Node,)

@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package vigtra.grpc_api;
+
+import "google/protobuf/struct.proto";
+
+service InsureeListController {
+    rpc List(InsureeListRequest) returns (InsureeListResponse) {}
+    rpc Retrieve(InsureeRetrieveRequest) returns (InsureeResponse) {}
+}
+
+message InsureeListRequest {
+}
+
+message InsureeListResponse {
+    repeated InsureeResponse results = 1;
+}
+
+message InsureeResponse {
+    optional int64 id = 1;
+    optional google.protobuf.Struct json_ext = 2;
+    optional string validity_from = 3;
+    optional string validity_to = 4;
+    optional int64 legacy_id = 5;
+    optional string uuid = 6;
+    optional string chf_id = 7;
+    string last_name = 8;
+    string other_names = 9;
+    optional string dob = 10;
+    optional string marital_status = 11;
+    optional string passport = 12;
+    optional string phone = 13;
+    optional string email = 14;
+    optional string current_address = 15;
+    optional string geolocation = 16;
+    optional string photo = 17;
+    optional string photo_date = 18;
+    optional bool card_issued = 19;
+    optional string card_issued_date = 20;
+    optional string identification_number = 21;
+    optional bool offline = 22;
+    optional string status = 23;
+    optional string status_date = 24;
+    optional string created_date = 25;
+    optional string last_modified = 26;
+    optional string notes = 27;
+    optional string gender = 28;
+    int64 location = 29;
+    optional string secondary_health_facility = 30;
+    optional int32 profession = 31;
+    optional int32 education = 32;
+    optional string identification = 33;
+    optional string health_facility = 34;
+    optional int64 audit_user = 35;
+    repeated string other_health_facilities = 36;
+}
+
+message InsureeRetrieveRequest {
+    int64 id = 1;
+}
+

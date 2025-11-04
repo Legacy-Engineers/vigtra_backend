@@ -16,7 +16,7 @@ class FormalSectorUser(models.Model):
         FormalSector,
         on_delete=models.CASCADE,
         related_name="formal_sector_user",
-        help_text=_("The formal sector associated with this user"),
+        help_text=_ ("The formal sector associated with this user"),
     )
 
     def __str__(self):
