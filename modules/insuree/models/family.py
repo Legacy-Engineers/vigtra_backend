@@ -117,7 +117,7 @@ class FamilyMembership(core_models.VersionedModel, LifecycleModel):
     )
 
     has_claim_benefits = models.BooleanField(
-        default=False, help_text=_("Whether this membership has claim benefits")
+        default=True, help_text=_("Whether this membership has claim benefits")
     )
 
     audit_user = models.ForeignKey(
@@ -326,7 +326,7 @@ class Family(core_models.VersionedModel, core_models.ExtendableModel, LifecycleM
     # Keep reference to head insuree for backward compatibility and quick access
     head_insuree = models.ForeignKey(
         "Insuree",
-        on_delete=models.PROTECT,  # Prevent deletion of head insuree
+        on_delete=models.PROTECT,
         db_column="InsureeID",
         related_name="head_of",
         help_text=_("Head of the family (maintained for compatibility)"),

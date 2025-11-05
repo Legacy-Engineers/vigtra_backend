@@ -10,7 +10,7 @@ fake = Faker()
 class FormalSectorDemoDataGenerator(BaseDemoDataGenerator):
 
     def run_demo(self):
-        return super().run_demo()
+        print("Passing..")
 
     def load_demo_data(self):
         pass

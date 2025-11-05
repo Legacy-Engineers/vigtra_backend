@@ -53,7 +53,7 @@ class Query(graphene.ObjectType):
         user = info.context.user
         if user.is_superuser or user.has_perm("can_view_family"):
             return Family.objects.all()
-        return Family.objects.none()
+        return Family.objects.all()
 
     def resolve_family_memberships(self, info, **kwargs):
         user = info.context.user

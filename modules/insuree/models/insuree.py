@@ -255,7 +255,6 @@ class Insuree(
         auto_now=True, help_text=_("Date insuree was last modified")
     )
 
-    notes = models.TextField(blank=True, null=True, help_text=_("Additional notes"))
 
     audit_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

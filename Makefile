@@ -12,6 +12,9 @@ migrate:
 runserver:
 	./dev_launch.sh
 
+generate-demo-data:
+	 uv run manage.py generate_demo_data
+
 generateproto:
 	uv run manage.py generateproto
 
@@ -20,3 +23,4 @@ grpc-devserver:
 
 install:
 	uv sync
+
