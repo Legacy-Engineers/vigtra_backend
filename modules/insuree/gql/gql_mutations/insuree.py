@@ -1,6 +1,7 @@
 from modules.core.gql.core_gql import CreateMutation
 from modules.insuree.services.insuree import InsureeService
 from modules.core.utils import vigtra_message
+from modules.authentication.utils import check_user_gql_permission
 import graphene
 
 INSUREE_SERVICE = InsureeService()
@@ -66,13 +67,6 @@ class CreateInsureeMutation(CreateMutation):
                     data=data,
                 )
 
-        # Extract user from context
-        user = info.context.user if hasattr(info.context, "user") else None
-        if not user or not user.is_authenticated:
-            return vigtra_message(
-                message="Authentication required",
-                data=data,
-                error_details=["User must be authenticated"],
-            )
-
+        user = info.context.user
+        check_user_gql_permission()
         return INSUREE_SERVICE.create_insuree(data, user=user)

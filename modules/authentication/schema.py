@@ -8,6 +8,11 @@ class Query(graphene.ObjectType):
     permissions = DjangoFilterConnectionField(gql_queries.PermissionGQLType)
     user_groups = DjangoFilterConnectionField(gql_queries.GroupGQLType)
     users = DjangoFilterConnectionField(gql_queries.UserGQLType)
+    user_info = graphene.Field(gql_queries.UserGQLType)
+
+    def resolve_user_info(self, info, **kwargs):
+        print(info.context.user)
+        return None
 
 
 class Mutation(graphene.ObjectType):

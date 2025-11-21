@@ -3,6 +3,8 @@ import re
 import string
 import random
 import logging
+from .models import Insuree
+from modules.location.models import Location
 
 logger = logging.getLogger(__name__)
 
@@ -145,3 +147,11 @@ def generate_identification_code(prefix: str, suffix: str) -> str:
     Generate a unique identification code based on the identification type.
     """
     return f"{prefix}-{generate_random_alphanumeric(10)}-{suffix}"
+
+
+def get_location_based_insurees(user_location: Location):
+    location_ids = user_location.get_descendants(include_self=True).values_list(
+        "id", flat=True
+    )
+
+    return Insuree.objects.filter(location_id__in=location_ids)

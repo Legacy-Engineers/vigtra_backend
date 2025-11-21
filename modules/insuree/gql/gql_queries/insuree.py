@@ -1,5 +1,12 @@
 from graphene_django import DjangoObjectType
-from modules.insuree.models import Insuree, IdentificationType, Family, FamilyMembership, InsureeStatus, InsureeIdentification
+from modules.insuree.models import (
+    Insuree,
+    IdentificationType,
+    Family,
+    FamilyMembership,
+    InsureeStatus,
+    InsureeIdentification,
+)
 from modules.core.utils import prefix_filterset
 from modules.formal_sector.gql.gql_queries import FormalSectorInsureeGQLType
 from modules.formal_sector.models import FormalSectorInsuree
@@ -16,6 +23,7 @@ class IdentificationTypeGQLType(DjangoObjectType):
         }
         interfaces = (graphene.relay.Node,)
 
+
 class InsureeIdentificationGQLType(DjangoObjectType):
     class Meta:
         model = InsureeIdentification
@@ -26,7 +34,9 @@ class InsureeIdentificationGQLType(DjangoObjectType):
         }
         interfaces = (graphene.relay.Node,)
 
-    identification_type = graphene.Field(IdentificationTypeGQLType, description="Identification type")
+    identification_type = graphene.Field(
+        IdentificationTypeGQLType, description="Identification type"
+    )
 
     def resolve_identification_type(self, info):
         return self.identification_type
@@ -64,8 +74,12 @@ class InsureeGQLType(DjangoObjectType):
     is_head_of_family = graphene.Boolean(
         description="Whether the insuree is head of family"
     )
-    identifications = graphene.List(InsureeIdentificationGQLType, description="List of identifications")
-    formal_sector_info = graphene.List(FormalSectorInsureeGQLType, description="List of formal sector information")
+    identifications = graphene.List(
+        InsureeIdentificationGQLType, description="List of identifications"
+    )
+    formal_sector_info = graphene.List(
+        FormalSectorInsureeGQLType, description="List of formal sector information"
+    )
 
     def resolve_formal_sector_info(self, info):
         return FormalSectorInsuree.objects.filter(insuree=self)
@@ -75,7 +89,7 @@ class InsureeGQLType(DjangoObjectType):
 
     gender_name = graphene.String(description="Name of the gender")
     profession_name = graphene.String(description="Name of the profession")
-        
+
     def resolve_profession_name(self, info):
         return self.profession.profession if self.profession else None
 

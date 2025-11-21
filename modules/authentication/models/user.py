@@ -40,12 +40,6 @@ class UserManager(BaseUserManager):
         return username.lower()
 
 
-class UserApplicationTypeChoices(models.TextChoices):
-    REGULAR_USER = "REGULAR_USER", _("Regular User")
-    LOCATION_BASED_USER = "LOCATION_BASED_USER", _("Location Based User")
-    HEALTH_FACILITY_USER = "HEALTH_FACILITY_USER", _("Health Facility User")
-
-
 class User(AbstractUser, PermissionsMixin):
     """
     Custom User model for the health software.
@@ -60,13 +54,6 @@ class User(AbstractUser, PermissionsMixin):
         _("created at"), default=timezone.now, db_default=Now()
     )
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
-
-    user_application_type = models.CharField(
-        max_length=255,
-        choices=UserApplicationTypeChoices.choices,
-        default=UserApplicationTypeChoices.REGULAR_USER,
-        help_text=_("Type of user application"),
-    )
 
     location = models.ForeignKey(
         Location,

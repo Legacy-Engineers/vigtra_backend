@@ -1,3 +1,4 @@
+from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
@@ -172,7 +173,8 @@ class Insuree(
             ("D", _("Divorced")),
             ("W", _("Widowed")),
         ],
-        help_text=_("Marital status"),
+        help_text=("Marital status"),
+        default="S",
     )
 
     # Enhanced validation for passport
@@ -254,7 +256,6 @@ class Insuree(
     last_modified = models.DateTimeField(
         auto_now=True, help_text=_("Date insuree was last modified")
     )
-
 
     audit_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -688,6 +689,7 @@ class Insuree(
 
 class InsureeIdentification(models.Model):
     """Model for insuree identification."""
+
     uuid = models.UUIDField(
         default=uuid.uuid4,
         unique=True,
@@ -696,9 +698,15 @@ class InsureeIdentification(models.Model):
         blank=True,
         help_text=_("Unique identifier for the insuree identification"),
     )
-    insuree = models.ForeignKey(Insuree, on_delete=models.CASCADE, help_text=_("Insuree"))
-    identification_type = models.ForeignKey(IdentificationType, on_delete=models.CASCADE, help_text=_("Identification type"))
-    identification_number = models.CharField(max_length=50, help_text=_("Identification number"))
+    insuree = models.ForeignKey(
+        Insuree, on_delete=models.CASCADE, help_text=_("Insuree")
+    )
+    identification_type = models.ForeignKey(
+        IdentificationType, on_delete=models.CASCADE, help_text=_("Identification type")
+    )
+    identification_number = models.CharField(
+        max_length=50, help_text=_("Identification number")
+    )
 
     class Meta:
         managed = True
