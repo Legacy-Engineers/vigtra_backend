@@ -11,13 +11,15 @@ from modules.insuree.models.insuree_model_dependency import (
     Education,
     IdentificationType,
 )
-from .family import FamilyMembership
+from .family import FamilyMembership, FamilyMembershipStatus
 
 from modules.location import models as location_models
 from .insuree_model_dependency import AGE_OF_MAJORITY
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db import transaction
+from .family import Family
 
 
 class InsureeStatus(models.TextChoices):
@@ -36,6 +38,25 @@ class InsureeManager(models.Manager):
     def active(self):
         """Return only active insurees."""
         return self.filter(status=InsureeStatus.ACTIVE)
+
+    @transaction.atomic
+    def create_head_of_family(self, **kwargs):
+        """Create an insuree who is head of family."""
+        insuree = self.create(**kwargs)
+        family = Family.objects.create(
+            head_insuree=insuree,
+            location=insuree.location,
+            address="",
+            audit_user=insuree.audit_user,
+        )
+        FamilyMembership.objects.create(
+            family=family,
+            insuree=insuree,
+            is_head=True,
+            status=FamilyMembershipStatus.ACTIVE,
+            audit_user=insuree.audit_user,
+        )
+        return insuree
 
     def heads_of_family(self):
         """Return only heads of families."""
