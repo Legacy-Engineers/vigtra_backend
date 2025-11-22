@@ -40,8 +40,6 @@ class BaseVersionedModel(models.Model):
 
 
 class VersionedModel(BaseVersionedModel):
-    legacy_id = models.IntegerField(db_column="LegacyID", blank=True, null=True)
-
     class Meta:
         abstract = True
 
@@ -55,4 +53,3 @@ class BaseCodeModel(models.Model):
 
     def __str__(self):
         return f"{self.code} - {getattr(self, 'name', getattr(self, 'description', self.code))}"
-

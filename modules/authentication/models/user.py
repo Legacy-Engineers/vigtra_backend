@@ -45,6 +45,9 @@ class User(AbstractUser, PermissionsMixin):
     Custom User model for the health software.
     """
 
+    first_name = None
+    last_name = None
+
     uuid = models.UUIDField(default=uuid.uuid4, unique=True)
     username = models.CharField(_("Username"), max_length=20, unique=True)
     email = models.EmailField(_("email address"), unique=True)

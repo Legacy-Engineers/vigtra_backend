@@ -1,4 +1,3 @@
-from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
@@ -143,8 +142,6 @@ class Insuree(
 
     chf_id = models.CharField(
         max_length=50,
-        blank=True,
-        null=True,
         unique=True,
         help_text=_("CHF identification number"),
     )

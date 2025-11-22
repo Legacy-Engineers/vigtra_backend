@@ -24,9 +24,10 @@ class AuthenticationDemoDataGenerator(BaseDemoDataGenerator):
 
     def generate_user(self):
         for user_data in self.load_user_demo_data():
-            User.objects.create(
+            new_user = User(
                 username=user_data["username"],
                 email=user_data["email"],
-                password=user_data["password"],
             )
+            new_user.set_password(user_data["password"])
+            new_user.save()
             logger.info(f"User generated: {user_data['username']}")
