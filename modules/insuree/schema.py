@@ -26,19 +26,18 @@ class Query(graphene.ObjectType):
             return None
 
     def resolve_insurees(self, info, **kwargs):
-        # user = info.context.user
+        user = info.context.user
         query_set = None
 
-        # check_user_gql_permission(user)
-        # if user.is_superuser:
-        #     query_set = Insuree.objects.all()
-        # elif user.has_perm("can_view_insuree"):
-        #     if hasattr(user, "location"):
-        #         query_set = get_location_based_insurees(user.location)
-        #     elif hasattr(user, "health_facility"):
-        #         pass
+        check_user_gql_permission(user)
+        if user.is_superuser:
+            query_set = Insuree.objects.all()
+        elif user.has_perm("can_view_insuree"):
+            if hasattr(user, "location"):
+                query_set = get_location_based_insurees(user.location)
+            elif hasattr(user, "health_facility"):
+                pass
 
-        query_set = Insuree.objects.all()
         return query_set
 
     def resolve_families(self, info, **kwargs):

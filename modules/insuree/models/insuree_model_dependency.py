@@ -4,11 +4,9 @@ from modules.core.models.openimis_core_models import BaseCodeModel
 from modules.core.config_manager import ConfigManager
 
 
-insuree_config = ConfigManager.get_insuree_config()
+insuree_config: dict = ConfigManager.get_insuree_config()
 
-AGE_OF_MAJORITY = insuree_config.get(
-    "max_age_of_majority", 18
-)  # Defaulting the value to 18 incase the configuration was removed
+AGE_OF_MAJORITY = insuree_config.get("max_age_of_majority", 18)
 
 
 class Gender(BaseCodeModel):

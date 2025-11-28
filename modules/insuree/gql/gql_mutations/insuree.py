@@ -1,7 +1,6 @@
 from modules.core.gql.core_gql import CreateMutation
 from modules.insuree.services.insuree import InsureeService
 from modules.core.utils import vigtra_message
-from modules.authentication.utils import check_user_gql_permission
 import graphene
 
 INSUREE_SERVICE = InsureeService()
@@ -58,7 +57,8 @@ class CreateInsureeMutation(CreateMutation):
     class Arguments:
         input = CreateInsureeInput(required=True)
 
-    def perform_mutation(self, root, info, **data):
+    @classmethod
+    def perform_mutation(cls, user, root, info, **data):
         auto_generate_chf_id = data.get("auto_generate_chf_id", True)
         if not auto_generate_chf_id:
             if not data.get("chf_id"):
@@ -67,6 +67,4 @@ class CreateInsureeMutation(CreateMutation):
                     data=data,
                 )
 
-        user = info.context.user
-        check_user_gql_permission()
         return INSUREE_SERVICE.create_insuree(data, user=user)

@@ -1,16 +1,15 @@
+import graphene
 from graphene_django import DjangoObjectType
-from modules.insuree.models import (
-    Insuree,
-    IdentificationType,
-    Family,
-    FamilyMembership,
-    InsureeStatus,
-    InsureeIdentification,
-)
-from modules.core.utils import prefix_filterset
+
 from modules.formal_sector.gql.gql_queries import FormalSectorInsureeGQLType
 from modules.formal_sector.models import FormalSectorInsuree
-import graphene
+from modules.insuree.models import (
+    Family,
+    FamilyMembership,
+    IdentificationType,
+    Insuree,
+    InsureeIdentification,
+)
 
 
 class IdentificationTypeGQLType(DjangoObjectType):
@@ -80,6 +79,7 @@ class InsureeGQLType(DjangoObjectType):
     formal_sector_info = graphene.List(
         FormalSectorInsureeGQLType, description="List of formal sector information"
     )
+    status = graphene.String()
 
     def resolve_formal_sector_info(self, info):
         return FormalSectorInsuree.objects.filter(insuree=self)
@@ -114,6 +114,7 @@ class InsureeGQLType(DjangoObjectType):
     def resolve_is_adult(self, info):
         if self.dob:
             from datetime import date
+
             from modules.insuree.models.insuree_model_dependency import AGE_OF_MAJORITY
 
             today = date.today()
@@ -193,23 +194,3 @@ class FamilyMembershipGQLType(DjangoObjectType):
 
     def resolve_relationship_name(self, info):
         return self.relationship.name if self.relationship else None
-
-
-# Set the models dynamically after Django is ready
-def _set_insuree_models():
-    from modules.insuree.models.insuree import Insuree
-    from modules.insuree.models.family import Family, FamilyMembership
-
-    InsureeGQLType._meta.model = Insuree
-    FamilyGQLType._meta.model = Family
-    FamilyMembershipGQLType._meta.model = FamilyMembership
-
-
-# This will be called when Django is ready
-try:
-    from django.apps import apps
-
-    if apps.is_installed("modules.insuree"):
-        _set_insuree_models()
-except:
-    pass

@@ -3,6 +3,7 @@ import os
 import yaml
 from modules.payment_gateway.apps import DEFAULT_PAYMENT_INTEGRATORS
 
+
 BASE_DIR = getattr(settings, "BASE_DIR", None)
 
 VIGTRA_CONFIG_FILE = os.path.join(BASE_DIR, "vigtra_core_config.yaml")
@@ -54,6 +55,7 @@ DEFAULT_VIGTRA_CONFIG_DATA = {
             "identification_regex": None,
         },
         "max_age_of_majority": 18,
+        "restric_matured_insuree_from_policy_benefits": False,
     },
     "claim": {
         "code_config": {

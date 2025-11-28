@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional, List
 import json
 
 
@@ -7,6 +7,11 @@ def vigtra_message(
     message: str = "",
     data: dict | None = "",
     error_details: str = "",
+    validation_errors: Optional[Dict] = None,
+    error_code: Optional[Dict] = None,
+    correlation_id: Optional[str] = None,
+    execution_time: Optional[float] = None,
+    affected_objects: Optional[List[Dict]] = None,
 ) -> Dict[str, bool | dict | str]:
     """
     Function to create a message dictionary for VIGTRA API responses.
@@ -36,6 +41,11 @@ def vigtra_message(
         "message": message,
         "data": data,
         "error_details": error_details,
+        "validation_errors": validation_errors,
+        "error_code": error_code,
+        "correlation_id": correlation_id,
+        "execution_time": execution_time,
+        "affected_objects": affected_objects,
     }
 
 
@@ -50,13 +60,21 @@ def get_data_from_file(file_path: str, file_type: str) -> dict:
         dict: Data read from the JSON file.
     """
 
-    if file_path == "json":
+    if file_type == "json":
         with open(file_path, "r") as file:
             data = json.load(file)
         return data
 
     else:
         raise ValueError("File type not supported. Only JSON files are supported.")
+
+
+def save_file_from_base64(file_base64: str, output_path: str) -> str:
+    try:
+        print("Testing")
+
+    except Exception as exce:
+        raise Exception(f"Failed to save file due to an unhandled error: {exce}")
 
 
 def prefix_filterset(prefix, filterset):

@@ -30,11 +30,9 @@ def sanitize_meta(meta: Dict[str, Any]) -> Dict[str, Any]:
     safe_meta = {}
     for key, value in meta.items():
         try:
-            # Test JSON serialization
             json.dumps(value)
             safe_meta[key] = value
         except (TypeError, ValueError, OverflowError):
-            # Skip non-serializable values and log for debugging
             logger.debug(
                 f"Skipping non-serializable meta key: {key} with value type: {type(value)}"
             )
@@ -155,6 +153,7 @@ class CoreMutation(graphene.Mutation, metaclass=CoreMutationMeta):
             Mutation response with success status and data
         """
         mutation_start_time = timezone.now()
+        user = info.context.user
         correlation_id = None
 
         if cls._create_correlation_id:
@@ -192,13 +191,11 @@ class CoreMutation(graphene.Mutation, metaclass=CoreMutationMeta):
 
             # Execute mutation within transaction
             with transaction.atomic():
-                # Set correlation ID in input data for use in perform_mutation
                 if correlation_id:
                     input_data["_correlation_id"] = correlation_id
 
-                mutation_result = cls.perform_mutation(root, info, **input_data)
+                mutation_result = cls.perform_mutation(user, root, info, **input_data)
 
-                # Ensure result is a MutationResult object
                 if isinstance(mutation_result, dict):
                     mutation_result = MutationResult(**mutation_result)
                 elif not isinstance(mutation_result, MutationResult):
@@ -206,14 +203,12 @@ class CoreMutation(graphene.Mutation, metaclass=CoreMutationMeta):
                         "perform_mutation must return MutationResult or dict"
                     )
 
-                # Set correlation ID and execution time
                 if correlation_id:
                     mutation_result.correlation_id = correlation_id
 
                 execution_time = (timezone.now() - mutation_start_time).total_seconds()
                 mutation_result.execution_time = execution_time
 
-                # Log the mutation
                 cls._log_mutation(info, input_data, mutation_result, execution_time)
 
                 return cls._create_response(mutation_result)
@@ -475,7 +470,7 @@ class CoreMutation(graphene.Mutation, metaclass=CoreMutationMeta):
     @classmethod
     @abstractmethod
     def perform_mutation(
-        cls, root, info, **input_data
+        cls, user, root, info, **input_data
     ) -> Union[MutationResult, Dict[str, Any]]:
         """
         Abstract method that subclasses must implement to perform the actual mutation logic.
