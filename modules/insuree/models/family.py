@@ -1,13 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from modules.core.models.openimis_core_models import BaseCodeModel
-from modules.core.models import openimis_core_models as core_models
+from modules.core.models.abstract_models import BaseCodeModel
+from modules.core.models import abstract_models as core_models
 import uuid
 from datetime import datetime, date
 from django.core.exceptions import ValidationError
 from django.conf import settings
-
-# Removed circular import - will use string references and lazy imports
 from modules.location import models as location_models
 from django.db.models import Q, F
 from django_lifecycle import LifecycleModel, hook, BEFORE_SAVE

@@ -4,7 +4,7 @@ from django.db.models import Q
 from django_lifecycle import LifecycleModel, hook, BEFORE_SAVE
 import uuid
 from datetime import datetime, date
-from modules.core.models import openimis_core_models as core_models
+from modules.core.models import abstract_models as core_models
 from modules.insuree.models.insuree_model_dependency import (
     Gender,
     Profession,

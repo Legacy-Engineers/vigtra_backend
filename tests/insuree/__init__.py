@@ -1,1 +1,0 @@
-# Insuree module tests

@@ -23,4 +23,3 @@ grpc-devserver:
 
 install:
 	uv sync
-

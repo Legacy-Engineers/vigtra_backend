@@ -1,4 +1,4 @@
-from modules.core.models.openimis_core_models import UUIDModel
+from modules.core.models.abstract_models import UUIDModel
 from modules.contract.models.contract import Contract
 from django.db import models
 

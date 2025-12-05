@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from mptt.models import MPTTModel, TreeForeignKey
 from guardian.models import BaseObjectPermission
 
-from modules.core.models.openimis_core_models import UUIDModel
+from modules.core.models.abstract_models import UUIDModel
 from simple_history.models import HistoricalRecords
 from django.utils import timezone
 
@@ -56,7 +56,7 @@ class Location(MPTTModel):
     )
     type = models.ForeignKey(
         LocationType,
-        on_delete=models.PROTECT,  # Changed from DO_NOTHING to PROTECT
+        on_delete=models.PROTECT,
         verbose_name="Location Type",
         help_text="Type of this location",
     )

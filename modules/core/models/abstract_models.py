@@ -1,8 +1,8 @@
 import logging
 import uuid
 from datetime import datetime as py_datetime
-from django.db import models
 
+from django.db import models
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,8 @@ class VersionedModel(BaseVersionedModel):
 
 class BaseCodeModel(models.Model):
     """Abstract base model for code-based lookup tables."""
+
+    code = models.CharField(max_length=20, null=False, blank=False)
 
     class Meta:
         abstract = True

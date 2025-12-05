@@ -1,7 +1,7 @@
 from django.db import models
 from modules.medical.models.item import Item
 from modules.medical.models.service import Service
-from modules.core.models.openimis_core_models import UUIDModel
+from modules.core.models.abstract_models import UUIDModel
 from django.utils import timezone
 
 

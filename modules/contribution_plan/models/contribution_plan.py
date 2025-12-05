@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q, F
-from modules.core.models import openimis_core_models as core_models
+from modules.core.models import abstract_models as core_models
 from modules.authentication.models import User
 from modules.location import models as location_models
 from django_lifecycle import LifecycleModel, hook, BEFORE_SAVE

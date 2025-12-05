@@ -37,3 +37,4 @@ extra_settings.yaml
 poetry.lock
 
 vigtra_core_config.yaml
+calculation_rule.config.yaml

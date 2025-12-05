@@ -1,10 +1,11 @@
 from django.db import models
-from modules.core.models.openimis_core_models import UUIDModel
-from modules.insuree.models import Insuree, Family
+
+from modules.claim.utils import claim_code_generator
+from modules.core.models.abstract_models import UUIDModel
+from modules.insurance_coverage.models import Coverage
+from modules.insuree.models import Family, Insuree
 from modules.location.models import HealthFacility
 from modules.medical.models import Diagnosis, Item, Service
-from modules.claim.utils import claim_code_generator
-from modules.insurance_coverage.models import Coverage
 
 
 class VisitType(models.TextChoices):
@@ -12,7 +13,6 @@ class VisitType(models.TextChoices):
     ROUTINE = "routine", "Routine"
     OTHER = "other", "Other"
     UNKNOWN = "unknown", "Unknown"
-    ENCOUNTER = "encounter", "Encounter"
 
 
 class ClaimStatus(models.TextChoices):

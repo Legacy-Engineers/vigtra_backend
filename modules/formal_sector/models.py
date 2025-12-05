@@ -1,17 +1,17 @@
 from django.db import models
 from modules.location.models import Location
+from mptt.models import MPTTModel, TreeForeignKey
 from modules.insuree.models import Insuree
 from modules.contribution_plan.models import ContributionPlanBundle
 import uuid
 
-# Create your models here.
 
 class SectorTypeChoices(models.TextChoices):
     PRIVATE_SECTOR = "PRS", "Private Sector"
     PUBLIC_SECTOR = "PUS", "Public Sector"
     NGO_SECTOR = "NS", "NGO Sector"
     INTERNATION_SECTOR = "IS", "International Sector"
-    COORPERATIVE_SECTOR =  "CS", "Cooperative Sector"
+    COORPERATIVE_SECTOR = "CS", "Cooperative Sector"
     ASSOICIATION_SECTOR = "AS", "Association Sector"
     SELF_EMPLOYED_SECTOR = "SE", "Self Employed Sector"
     INFORMAL_SECTOR = "INS", "Informal Sector"
@@ -19,11 +19,24 @@ class SectorTypeChoices(models.TextChoices):
     OTHER_SECTOR = "OS", "Other Sectors"
 
 
-class FormalSector(models.Model):
+class FormalSector(MPTTModel):
     code = models.CharField(max_length=32)
     trade_name = models.CharField(max_length=255)
-    sector_type = models.CharField(max_length=10, choices=SectorTypeChoices.choices, default=SectorTypeChoices.PRIVATE_SECTOR)
+    sector_type = models.CharField(
+        max_length=10,
+        choices=SectorTypeChoices.choices,
+        default=SectorTypeChoices.PRIVATE_SECTOR,
+    )
     sector_type_other = models.CharField(max_length=20, blank=True, null=True)
+    parent = TreeForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="children",
+        verbose_name="Parent Location",
+        help_text="Parent location in the hierarchy",
+    )
     location = models.ForeignKey(
         Location,
         on_delete=models.deletion.DO_NOTHING,

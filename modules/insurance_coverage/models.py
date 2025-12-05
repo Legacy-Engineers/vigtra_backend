@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from modules.core.models import openimis_core_models as core_models
+from modules.core.models import abstract_models as core_models
 from modules.insurance_plan.models import InsurancePlan
 import uuid
 

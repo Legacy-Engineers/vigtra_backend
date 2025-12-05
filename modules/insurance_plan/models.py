@@ -1,5 +1,5 @@
 from django.db import models
-from modules.core.models import openimis_core_models as core_models
+from modules.core.models import abstract_models as core_models
 from modules.authentication.models import User
 from modules.contribution_plan.models import ContributionPlan
 from django_lifecycle import LifecycleModel

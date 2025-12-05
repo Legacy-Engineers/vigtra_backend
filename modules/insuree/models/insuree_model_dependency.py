@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from modules.core.models.openimis_core_models import BaseCodeModel
+from modules.core.models.abstract_models import BaseCodeModel
 from modules.core.config_manager import ConfigManager
 
 

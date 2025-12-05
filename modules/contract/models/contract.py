@@ -1,4 +1,4 @@
-from modules.core.models.openimis_core_models import UUIDModel
+from modules.core.models.abstract_models import UUIDModel
 from modules.formal_sector.models import FormalSector
 from django.db import models
 from django.contrib.auth import get_user_model

@@ -1,5 +1,5 @@
 from django.db import models
-from modules.core.models.openimis_core_models import UUIDModel
+from modules.core.models.abstract_models import UUIDModel
 from modules.medical.utils import generate_medical_code
 from simple_history.models import HistoricalRecords
 
