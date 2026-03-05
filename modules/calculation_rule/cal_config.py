@@ -1,4 +1,3 @@
-from typing import List, Dict, Optional
 import pathlib
 from dataclasses import dataclass
 from modules.core.config_manager import BASE_DIR
@@ -39,6 +38,5 @@ class CalculationConfigManager:
 
     @classmethod
     def load_configuration(cls):
-        CALCULATION_RULE_CONFIG_FILE.mkdir(exist_ok=True)
-        with open(CALCULATION_RULE_CONFIG_FILE) as file:
-            yaml.safe_dump(DEFAULT_CONFIG, file)
+        with open(CALCULATION_RULE_CONFIG_FILE, "w") as file:
+            yaml.safe_dump([vars(entry) for entry in DEFAULT_CONFIG], file)

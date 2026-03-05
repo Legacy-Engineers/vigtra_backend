@@ -6,7 +6,5 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 # Auto-generate temporary Django secret key for development
 INTERNAL_IPS = ["127.0.0.1"]
 
-# JWT Settings
-
 
 include(*SETTINGS)
